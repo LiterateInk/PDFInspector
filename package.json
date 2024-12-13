@@ -1,6 +1,6 @@
 {
   "name": "@literate.ink/pdf-inspector",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "description": "",
   "repository": "https://github.com/LiterateInk/PDFInspector",
   "sideEffects": false,
