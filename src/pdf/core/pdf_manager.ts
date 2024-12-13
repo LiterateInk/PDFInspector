@@ -12,8 +12,8 @@ export class LocalPdfManager {
 
   async ensure (obj: any, prop: string, args?: any[]) {
     let value = obj[prop];
-    
-    if (typeof(value) === 'function') {
+
+    if (typeof(value) === "function") {
       value = value.apply(obj, args);
     }
 

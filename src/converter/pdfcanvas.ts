@@ -4,7 +4,7 @@ import PDFLine from "./pdfline";
 import PDFFill from "./pdffill";
 import PDFFont, { FontObject } from "./pdffont";
 
-const { sin: ms, cos: mc, abs, sqrt } = Math;    
+const { sin: ms, cos: mc, abs, sqrt } = Math;
 
 // pre-compute "00" to "FF"
 const dec2hex: string[] = [];
@@ -56,38 +56,38 @@ const copyState = (o1: Partial<CanvasRenderingContext2D_>, o2: Partial<CanvasRen
   o2.arcScaleY_ = o1.arcScaleY_;
   o2.lineScale_ = o1.lineScale_;
   o2.dashArray = o1.dashArray;
-}
+};
 
 const processStyle = (styleString: string) => {
   let str: string;
   let alpha: number = 1;
 
   styleString = String(styleString);
-  if (styleString.substring(0, 3) == 'rgb') {
-      let start = styleString.indexOf('(', 3);
-      let end = styleString.indexOf(')', start + 1);
-      let guts = styleString.substring(start + 1, end).split(',');
+  if (styleString.substring(0, 3) == "rgb") {
+    let start = styleString.indexOf("(", 3);
+    let end = styleString.indexOf(")", start + 1);
+    let guts = styleString.substring(start + 1, end).split(",");
 
-      str = '#';
-      for (let i = 0; i < 3; i++) {
-          str += dec2hex[Number(guts[i])];
-      }
+    str = "#";
+    for (let i = 0; i < 3; i++) {
+      str += dec2hex[Number(guts[i])];
+    }
 
-      if (guts.length == 4 && styleString.substring(3, 4) == 'a') {
-        alpha = parseInt(guts[3]);
-      }
+    if (guts.length == 4 && styleString.substring(3, 4) == "a") {
+      alpha = parseInt(guts[3]);
+    }
   }
   else {
     str = styleString;
   }
 
   return { color: str, alpha: alpha };
-}
+};
 
 // Helper function that takes the already fixed cordinates.
 function bezierCurveToHelper(self: CanvasRenderingContext2D_, cp1: Point, cp2: Point, p: Point) {
   self.currentPath_.push({
-    type: 'bezierCurveTo',
+    type: "bezierCurveTo",
     cp1x: cp1.x,
     cp1y: cp1.y,
     cp2x: cp2.x,
@@ -95,20 +95,20 @@ function bezierCurveToHelper(self: CanvasRenderingContext2D_, cp1: Point, cp2: P
     x: p.x,
     y: p.y
   });
-  
+
   self.currentX_ = p.x;
   self.currentY_ = p.y;
 }
 
 function matrixIsFinite(m: Array<Array<number>>) {
-    for (let j = 0; j < 3; j++) {
-        for (let k = 0; k < 2; k++) {
-            if (!isFinite(m[j][k]) || isNaN(m[j][k])) {
-                return false;
-            }
-        }
+  for (let j = 0; j < 3; j++) {
+    for (let k = 0; k < 2; k++) {
+      if (!isFinite(m[j][k]) || isNaN(m[j][k])) {
+        return false;
+      }
     }
-    return true;
+  }
+  return true;
 }
 
 function setM(ctx: CanvasRenderingContext2D_, m: Array<Array<number>>, updateLineScale?: boolean) {
@@ -126,8 +126,8 @@ function setM(ctx: CanvasRenderingContext2D_, m: Array<Array<number>>, updateLin
 }
 
 class CanvasPattern_ {
-    constructor() {        
-    }
+  constructor() {
+  }
 }
 
 // Gradient / Pattern Stubs
@@ -140,7 +140,7 @@ class CanvasGradient_ {
   y1_: number;
   r1_: number;
   colors_: Array<any>;
-  
+
   constructor (aType: string) {
     this.type_ = aType;
     this.x0_ = 0;
@@ -159,7 +159,7 @@ class CanvasGradient_ {
       color: paColor.color,
       alpha: paColor.alpha
     });
-  }    
+  }
 }
 
 export interface Canvas {
@@ -169,7 +169,9 @@ export interface Canvas {
   Texts: Text[]
 }
 
-interface Point { x: number, y: number }
+interface Point {
+  x: number, y: number
+}
 
 /**
  * This class implements CanvasRenderingContext2D interface as described by
@@ -212,412 +214,412 @@ export default class CanvasRenderingContext2D_ {
   shadowOffsetY: number | undefined;
 
   constructor(canvasTarget: Partial<Canvas>, scaledWidth: number, scaledHeight: number) {
-      this.m_ = createMatrixIdentity();
+    this.m_ = createMatrixIdentity();
 
-      this.mStack_ = [];
-      this.aStack_ = [];
-      this.currentPath_ = [];
+    this.mStack_ = [];
+    this.aStack_ = [];
+    this.currentPath_ = [];
 
-      // Canvas context properties
-      this.strokeStyle = '#000';
-      this.fillStyle = '#000';
+    // Canvas context properties
+    this.strokeStyle = "#000";
+    this.fillStyle = "#000";
 
-      this.lineWidth = 1;
-      this.lineJoin = 'miter';
-      this.lineCap = 'butt';
-      this.dashArray = [];
-      this.miterLimit = 1;
-      this.globalAlpha = 1;
+    this.lineWidth = 1;
+    this.lineJoin = "miter";
+    this.lineCap = "butt";
+    this.dashArray = [];
+    this.miterLimit = 1;
+    this.globalAlpha = 1;
 
-      if (!("HLines" in canvasTarget) || !Array.isArray(canvasTarget.HLines))
-          canvasTarget.HLines = [];
-      if (!("VLines" in canvasTarget) || !Array.isArray(canvasTarget.VLines))
-          canvasTarget.VLines = [];
-      if (!("Fills" in canvasTarget) || !Array.isArray(canvasTarget.Fills))
-          canvasTarget.Fills = [];
-      if (!("Texts" in canvasTarget) || !Array.isArray(canvasTarget.Texts))
-          canvasTarget.Texts = [];
+    if (!("HLines" in canvasTarget) || !Array.isArray(canvasTarget.HLines))
+      canvasTarget.HLines = [];
+    if (!("VLines" in canvasTarget) || !Array.isArray(canvasTarget.VLines))
+      canvasTarget.VLines = [];
+    if (!("Fills" in canvasTarget) || !Array.isArray(canvasTarget.Fills))
+      canvasTarget.Fills = [];
+    if (!("Texts" in canvasTarget) || !Array.isArray(canvasTarget.Texts))
+      canvasTarget.Texts = [];
 
-      this.canvas = canvasTarget as Canvas;
+    this.canvas = canvasTarget as Canvas;
 
-      this.width = scaledWidth;
-      this.height = scaledHeight;
+    this.width = scaledWidth;
+    this.height = scaledHeight;
 
-      this.arcScaleX_ = 1;
-      this.arcScaleY_ = 1;
-      this.lineScale_ = 1;
+    this.arcScaleX_ = 1;
+    this.arcScaleY_ = 1;
+    this.lineScale_ = 1;
 
+    this.currentFont = null;
+  }
+
+  //private helper methods
+  #drawPDFLine(p1: Point, p2: Point, lineWidth: number, color: string) {
+    let dashedLine = Array.isArray(this.dashArray) && (this.dashArray.length > 1);
+    let pL = new PDFLine(p1.x, p1.y, p2.x, p2.y, lineWidth, color, dashedLine);
+    pL.processLine(this.canvas);
+  }
+
+  #drawPDFFill(cp: Point, min: Point, max: Point, color: string) {
+    let width = max.x - min.x;
+    let height = max.y - min.y;
+    let pF = new PDFFill(cp.x, cp.y, width, height, color);
+    pF.processFill(this.canvas);
+  }
+
+  #needRemoveRect(x: number, y: number, w: number, h: number): boolean {
+    let retVal = (Math.abs(w - Math.abs(h)) < 1 && w < 13);
+    return retVal;
+  }
+
+  getContext(ctxType: "2d") {
+    return (ctxType === "2d") ? this : null;
+  }
+
+  setLineDash(lineDash: any[]): void {
+    this.dashArray = lineDash;
+  }
+
+  getLineDash() {
+    return this.dashArray;
+  }
+
+  fillText (text: string, x: number, y: number, maxWidth: number, fontSize: number) {
+    if (!text || text.trim().length < 1)
+      return;
+    let p = this.getCoords_(x, y);
+
+    let a = processStyle(this.fillStyle || this.strokeStyle);
+    let color = (!!a) ? a.color : "#000000";
+
+    this.currentFont?.processText(p, text, maxWidth, color, fontSize, this.canvas, this.m_);
+  };
+
+  strokeText(text: string, x: number, y: number, maxWidth: number) {
+    // i added 12 for type but actually what to do with it?
+    this.fillText(text, x, y, maxWidth, 12);
+  }
+
+  measureText(text: string) {
+    console.warn("to be implemented: contextPrototype.measureText - ", text);
+    let chars = text.length || 1;
+    return {width: chars * (this.currentFont?.spaceWidth || 5)};
+  }
+
+  setFont(fontObj: FontObject) {
+    if (!!this.currentFont) {
       this.currentFont = null;
     }
 
-    //private helper methods
-    #drawPDFLine(p1: Point, p2: Point, lineWidth: number, color: string) {
-      let dashedLine = Array.isArray(this.dashArray) && (this.dashArray.length > 1);
-      let pL = new PDFLine(p1.x, p1.y, p2.x, p2.y, lineWidth, color, dashedLine);
-      pL.processLine(this.canvas);
-    }
+    this.currentFont = new PDFFont(fontObj);
+  }
 
-    #drawPDFFill(cp: Point, min: Point, max: Point, color: string) {
-      let width = max.x - min.x;
-      let height = max.y - min.y;
-      let pF = new PDFFill(cp.x, cp.y, width, height, color);
-      pF.processFill(this.canvas);
-    }
+  clearRect() {
+    console.warn("to be implemented: contextPrototype.clearRect");
+  }
 
-    #needRemoveRect(x: number, y: number, w: number, h: number): boolean {
-      let retVal = (Math.abs(w - Math.abs(h)) < 1 && w < 13);
-      return retVal;
-    }
+  beginPath() {
+    this.currentPath_ = [];
+  }
 
-    getContext(ctxType: "2d") {
-      return (ctxType === "2d") ? this : null;
-    }
+  moveTo(aX: number, aY: number) {
+    let p = this.getCoords_(aX, aY);
+    this.currentPath_.push({type:"moveTo", x:p.x, y:p.y});
+    this.currentX_ = p.x;
+    this.currentY_ = p.y;
+  }
 
-    setLineDash(lineDash: any[]): void {
-      this.dashArray = lineDash;
-    }
+  lineTo(aX: number, aY: number) {
+    let p = this.getCoords_(aX, aY);
+    this.currentPath_.push({type:"lineTo", x:p.x, y:p.y});
 
-    getLineDash() {
-      return this.dashArray;
-    }
+    this.currentX_ = p.x;
+    this.currentY_ = p.y;
+  }
 
-    fillText (text: string, x: number, y: number, maxWidth: number, fontSize: number) {
-        if (!text || text.trim().length < 1)
-            return;
-        let p = this.getCoords_(x, y);
+  bezierCurveTo(aCP1x: number, aCP1y: number, aCP2x: number, aCP2y: number, aX: number, aY: number) {
+    let p = this.getCoords_(aX, aY);
+    let cp1 = this.getCoords_(aCP1x, aCP1y);
+    let cp2 = this.getCoords_(aCP2x, aCP2y);
+    bezierCurveToHelper(this, cp1, cp2, p);
+  }
 
-        let a = processStyle(this.fillStyle || this.strokeStyle);
-        let color = (!!a) ? a.color : '#000000';
+  quadraticCurveTo(aCPx: number, aCPy: number, aX: number, aY: number) {
+    // the following is lifted almost directly from
+    // http://developer.mozilla.org/en/docs/Canvas_tutorial:Drawing_shapes
 
-        this.currentFont?.processText(p, text, maxWidth, color, fontSize, this.canvas, this.m_);
+    let cp = this.getCoords_(aCPx, aCPy);
+    let p = this.getCoords_(aX, aY);
+
+    let cp1 = {
+      x:this.currentX_ + 2.0 / 3.0 * (cp.x - this.currentX_),
+      y:this.currentY_ + 2.0 / 3.0 * (cp.y - this.currentY_)
+    };
+    let cp2 = {
+      x:cp1.x + (p.x - this.currentX_) / 3.0,
+      y:cp1.y + (p.y - this.currentY_) / 3.0
     };
 
-    strokeText(text: string, x: number, y: number, maxWidth: number) {
-      // i added 12 for type but actually what to do with it?
-      this.fillText(text, x, y, maxWidth, 12);
+    bezierCurveToHelper(this, cp1, cp2, p);
+  }
+
+  arc(aX: number, aY: number, aRadius: number, aStartAngle: number, aEndAngle: number, aClockwise: boolean) {
+    let arcType = aClockwise ? "at" : "wa";
+
+    let xStart = aX + mc(aStartAngle) * aRadius;
+    let yStart = aY + ms(aStartAngle) * aRadius;
+
+    let xEnd = aX + mc(aEndAngle) * aRadius;
+    let yEnd = aY + ms(aEndAngle) * aRadius;
+
+    // IE won't render arches drawn counter clockwise if xStart == xEnd.
+    if (xStart == xEnd && !aClockwise) {
+      xStart += 0.125; // Offset xStart by 1/80 of a pixel. Use something
+      // that can be represented in binary
     }
 
-    measureText(text: string) {
-      console.warn("to be implemented: contextPrototype.measureText - ", text);
-      let chars = text.length || 1;
-      return {width: chars * (this.currentFont?.spaceWidth || 5)};
+    let p = this.getCoords_(aX, aY);
+    let pStart = this.getCoords_(xStart, yStart);
+    let pEnd = this.getCoords_(xEnd, yEnd);
+
+    this.currentPath_.push({type:arcType,
+      x:p.x,
+      y:p.y,
+      radius:aRadius,
+      xStart:pStart.x,
+      yStart:pStart.y,
+      xEnd:pEnd.x,
+      yEnd:pEnd.y});
+  }
+
+  rect(aX: number, aY: number, aWidth: number, aHeight: number) {
+    if (this.#needRemoveRect(aX, aY, aWidth, aHeight)) {
+      return;//try to remove the rectangle behind radio buttons and checkboxes
     }
 
-    setFont(fontObj: FontObject) {
-      if (!!this.currentFont) {
-        this.currentFont = null;
+    this.moveTo(aX, aY);
+    this.lineTo(aX + aWidth, aY);
+    this.lineTo(aX + aWidth, aY + aHeight);
+    this.lineTo(aX, aY + aHeight);
+    this.closePath();
+  }
+
+  strokeRect(aX: number, aY: number, aWidth: number, aHeight: number) {
+    if (this.#needRemoveRect(aX, aY, aWidth, aHeight)) {
+      return;//try to remove the rectangle behind radio buttons and checkboxes
+    }
+
+    let oldPath = this.currentPath_;
+    this.beginPath();
+
+    this.moveTo(aX, aY);
+    this.lineTo(aX + aWidth, aY);
+    this.lineTo(aX + aWidth, aY + aHeight);
+    this.lineTo(aX, aY + aHeight);
+    this.closePath();
+    this.stroke();
+
+    this.currentPath_ = oldPath;
+  }
+
+  fillRect(aX: number, aY: number, aWidth: number, aHeight: number) {
+    if (this.#needRemoveRect(aX, aY, aWidth, aHeight)) {
+      return;//try to remove the rectangle behind radio buttons and checkboxes
+    }
+
+    let oldPath = this.currentPath_;
+    this.beginPath();
+
+    this.moveTo(aX, aY);
+    this.lineTo(aX + aWidth, aY);
+    this.lineTo(aX + aWidth, aY + aHeight);
+    this.lineTo(aX, aY + aHeight);
+    this.closePath();
+    this.fill();
+
+    this.currentPath_ = oldPath;
+  }
+
+  createLinearGradient(aX0: number, aY0: number, aX1: number, aY1: number) {
+    let gradient = new CanvasGradient_("gradient");
+    gradient.x0_ = aX0;
+    gradient.y0_ = aY0;
+    gradient.x1_ = aX1;
+    gradient.y1_ = aY1;
+    return gradient;
+  }
+
+  createRadialGradient(aX0: number, aY0: number, aR0: number, aX1: number, aY1: number, aR1: number) {
+    let gradient = new CanvasGradient_("gradientradial");
+    gradient.x0_ = aX0;
+    gradient.y0_ = aY0;
+    gradient.r0_ = aR0;
+    gradient.x1_ = aX1;
+    gradient.y1_ = aY1;
+    gradient.r1_ = aR1;
+    return gradient;
+  }
+
+  drawImage (): void {}
+
+  /** Returns an empty buffer. */
+  getImageData (x: number, y: number, w: number, h: number) {
+    return {
+      width: w, height: h,
+      data: new Uint8Array(w * h * 4)
+    };
+  }
+
+  stroke (aFill?: boolean) {
+    if (this.currentPath_.length < 2) {
+      return;
+    }
+
+    let a = processStyle(aFill ? this.fillStyle : this.strokeStyle);
+    let color = a.color;
+    let lineWidth = this.lineScale_ * this.lineWidth;
+
+    let min = {x:null, y:null};
+    let max = {x:null, y:null};
+
+    for (let i = 0; i < this.currentPath_.length; i++) {
+      let p = this.currentPath_[i];
+
+      switch (p.type) {
+        case "moveTo":
+          break;
+        case "lineTo":
+          if (!aFill) { //lines
+            if (i > 0) {
+              this.#drawPDFLine(this.currentPath_[i-1], p, lineWidth, color);
+            }
+          }
+          break;
+        case "close":
+          if (!aFill) { //lines
+            if (i > 0) {
+              this.#drawPDFLine(this.currentPath_[i-1], this.currentPath_[0], lineWidth, color);
+            }
+          }
+          p = null;
+          break;
+        case "bezierCurveTo":
+          break;
+        case "at":
+        case "wa":
+          break;
       }
 
-      this.currentFont = new PDFFont(fontObj);
-    }
-
-    clearRect() {
-        console.warn("to be implemented: contextPrototype.clearRect");
-    }
-
-    beginPath() {
-      this.currentPath_ = [];
-    }
-
-    moveTo(aX: number, aY: number) {
-      let p = this.getCoords_(aX, aY);
-      this.currentPath_.push({type:'moveTo', x:p.x, y:p.y});
-      this.currentX_ = p.x;
-      this.currentY_ = p.y;
-    }
-
-    lineTo(aX: number, aY: number) {
-      let p = this.getCoords_(aX, aY);
-      this.currentPath_.push({type:'lineTo', x:p.x, y:p.y});
-
-      this.currentX_ = p.x;
-      this.currentY_ = p.y;
-    }
-
-    bezierCurveTo(aCP1x: number, aCP1y: number, aCP2x: number, aCP2y: number, aX: number, aY: number) {
-      let p = this.getCoords_(aX, aY);
-      let cp1 = this.getCoords_(aCP1x, aCP1y);
-      let cp2 = this.getCoords_(aCP2x, aCP2y);
-      bezierCurveToHelper(this, cp1, cp2, p);
-    }
-
-    quadraticCurveTo(aCPx: number, aCPy: number, aX: number, aY: number) {
-        // the following is lifted almost directly from
-        // http://developer.mozilla.org/en/docs/Canvas_tutorial:Drawing_shapes
-
-        let cp = this.getCoords_(aCPx, aCPy);
-        let p = this.getCoords_(aX, aY);
-
-        let cp1 = {
-            x:this.currentX_ + 2.0 / 3.0 * (cp.x - this.currentX_),
-            y:this.currentY_ + 2.0 / 3.0 * (cp.y - this.currentY_)
-        };
-        let cp2 = {
-            x:cp1.x + (p.x - this.currentX_) / 3.0,
-            y:cp1.y + (p.y - this.currentY_) / 3.0
-        };
-
-        bezierCurveToHelper(this, cp1, cp2, p);
-    }
-
-    arc(aX: number, aY: number, aRadius: number, aStartAngle: number, aEndAngle: number, aClockwise: boolean) {
-        let arcType = aClockwise ? 'at' : 'wa';
-
-        let xStart = aX + mc(aStartAngle) * aRadius;
-        let yStart = aY + ms(aStartAngle) * aRadius;
-
-        let xEnd = aX + mc(aEndAngle) * aRadius;
-        let yEnd = aY + ms(aEndAngle) * aRadius;
-
-        // IE won't render arches drawn counter clockwise if xStart == xEnd.
-        if (xStart == xEnd && !aClockwise) {
-            xStart += 0.125; // Offset xStart by 1/80 of a pixel. Use something
-            // that can be represented in binary
+      // Figure out dimensions so we can set fills' coordinates correctly
+      if (aFill && p) {
+        if (min.x == null || p.x < min.x) {
+          min.x = p.x;
         }
-
-        let p = this.getCoords_(aX, aY);
-        let pStart = this.getCoords_(xStart, yStart);
-        let pEnd = this.getCoords_(xEnd, yEnd);
-
-        this.currentPath_.push({type:arcType,
-            x:p.x,
-            y:p.y,
-            radius:aRadius,
-            xStart:pStart.x,
-            yStart:pStart.y,
-            xEnd:pEnd.x,
-            yEnd:pEnd.y});
-    }
-
-    rect(aX: number, aY: number, aWidth: number, aHeight: number) {
-        if (this.#needRemoveRect(aX, aY, aWidth, aHeight)) {
-            return;//try to remove the rectangle behind radio buttons and checkboxes
+        if (max.x == null || p.x > max.x) {
+          max.x = p.x;
         }
-
-        this.moveTo(aX, aY);
-        this.lineTo(aX + aWidth, aY);
-        this.lineTo(aX + aWidth, aY + aHeight);
-        this.lineTo(aX, aY + aHeight);
-        this.closePath();
-    }
-
-    strokeRect(aX: number, aY: number, aWidth: number, aHeight: number) {
-        if (this.#needRemoveRect(aX, aY, aWidth, aHeight)) {
-            return;//try to remove the rectangle behind radio buttons and checkboxes
+        if (min.y == null || p.y < min.y) {
+          min.y = p.y;
         }
-
-        let oldPath = this.currentPath_;
-        this.beginPath();
-
-        this.moveTo(aX, aY);
-        this.lineTo(aX + aWidth, aY);
-        this.lineTo(aX + aWidth, aY + aHeight);
-        this.lineTo(aX, aY + aHeight);
-        this.closePath();
-        this.stroke();
-
-        this.currentPath_ = oldPath;
-    }
-
-    fillRect(aX: number, aY: number, aWidth: number, aHeight: number) {
-        if (this.#needRemoveRect(aX, aY, aWidth, aHeight)) {
-            return;//try to remove the rectangle behind radio buttons and checkboxes
+        if (max.y == null || p.y > max.y) {
+          max.y = p.y;
         }
-
-        let oldPath = this.currentPath_;
-        this.beginPath();
-
-        this.moveTo(aX, aY);
-        this.lineTo(aX + aWidth, aY);
-        this.lineTo(aX + aWidth, aY + aHeight);
-        this.lineTo(aX, aY + aHeight);
-        this.closePath();
-        this.fill();
-
-        this.currentPath_ = oldPath;
-    }
-
-    createLinearGradient(aX0: number, aY0: number, aX1: number, aY1: number) {
-        let gradient = new CanvasGradient_('gradient');
-        gradient.x0_ = aX0;
-        gradient.y0_ = aY0;
-        gradient.x1_ = aX1;
-        gradient.y1_ = aY1;
-        return gradient;
-    }
-
-    createRadialGradient(aX0: number, aY0: number, aR0: number, aX1: number, aY1: number, aR1: number) {
-        let gradient = new CanvasGradient_('gradientradial');
-        gradient.x0_ = aX0;
-        gradient.y0_ = aY0;
-        gradient.r0_ = aR0;
-        gradient.x1_ = aX1;
-        gradient.y1_ = aY1;
-        gradient.r1_ = aR1;
-        return gradient;
-    }
-
-    drawImage (): void {}
-
-    /** Returns an empty buffer. */
-    getImageData (x: number, y: number, w: number, h: number) {
-      return {
-        width: w, height: h,
-        data: new Uint8Array(w * h * 4)
-      };
-    }
-
-    stroke (aFill?: boolean) {
-      if (this.currentPath_.length < 2) {
-          return;
-      }
-
-      let a = processStyle(aFill ? this.fillStyle : this.strokeStyle);
-      let color = a.color;
-      let lineWidth = this.lineScale_ * this.lineWidth;
-
-      let min = {x:null, y:null};
-      let max = {x:null, y:null};
-
-      for (let i = 0; i < this.currentPath_.length; i++) {
-        let p = this.currentPath_[i];
-
-        switch (p.type) {
-            case 'moveTo':
-                break;
-            case 'lineTo':
-                if (!aFill) { //lines
-                    if (i > 0) {
-                        this.#drawPDFLine(this.currentPath_[i-1], p, lineWidth, color);
-                    }
-                }
-                break;
-            case 'close':
-                if (!aFill) { //lines
-                    if (i > 0) {
-                        this.#drawPDFLine(this.currentPath_[i-1], this.currentPath_[0], lineWidth, color);
-                    }
-                }
-                p = null;
-                break;
-            case 'bezierCurveTo':
-                break;
-            case 'at':
-            case 'wa':
-                break;
-        }
-
-        // Figure out dimensions so we can set fills' coordinates correctly
-        if (aFill && p) {
-            if (min.x == null || p.x < min.x) {
-                min.x = p.x;
-            }
-            if (max.x == null || p.x > max.x) {
-                max.x = p.x;
-            }
-            if (min.y == null || p.y < min.y) {
-                min.y = p.y;
-            }
-            if (max.y == null || p.y > max.y) {
-                max.y = p.y;
-            }
-        }
-      }
-
-      if (aFill) {
-        this.#drawPDFFill(min as unknown as Point, min as unknown as Point, max as unknown as Point, color);
       }
     }
 
-    fill () {
-      this.stroke(true);
+    if (aFill) {
+      this.#drawPDFFill(min as unknown as Point, min as unknown as Point, max as unknown as Point, color);
     }
+  }
 
-    closePath() {
-      this.currentPath_.push({ type:'close' });
-    }
+  fill () {
+    this.stroke(true);
+  }
 
-    private getCoords_ (aX: number, aY: number) {
-      let m = this.m_;
-      return {
-        x: (aX * m[0][0] + aY * m[1][0] + m[2][0]),
-        y: (aX * m[0][1] + aY * m[1][1] + m[2][1])
-      };
-    }
+  closePath() {
+    this.currentPath_.push({ type:"close" });
+  }
 
-    save () {
-      let o = {};
-      copyState(this, o);
-      this.aStack_.push(o);
-      this.mStack_.push(this.m_);
-      this.m_ = matrixMultiply(createMatrixIdentity(), this.m_);
-    }
+  private getCoords_ (aX: number, aY: number) {
+    let m = this.m_;
+    return {
+      x: (aX * m[0][0] + aY * m[1][0] + m[2][0]),
+      y: (aX * m[0][1] + aY * m[1][1] + m[2][1])
+    };
+  }
 
-    restore() {
-      copyState(this.aStack_.pop(), this);
-      // @ts-expect-error
-      this.m_ = this.mStack_.pop();
-    }
+  save () {
+    let o = {};
+    copyState(this, o);
+    this.aStack_.push(o);
+    this.mStack_.push(this.m_);
+    this.m_ = matrixMultiply(createMatrixIdentity(), this.m_);
+  }
 
-    translate(aX: number, aY: number) {
-        let m1 = [
-            [1, 0, 0],
-            [0, 1, 0],
-            [aX, aY, 1]
-        ];
+  restore() {
+    copyState(this.aStack_.pop(), this);
+    // @ts-expect-error
+    this.m_ = this.mStack_.pop();
+  }
 
-        setM(this, matrixMultiply(m1, this.m_), false);
-    }
+  translate(aX: number, aY: number) {
+    let m1 = [
+      [1, 0, 0],
+      [0, 1, 0],
+      [aX, aY, 1]
+    ];
 
-    rotate(aRot: number) {
-        let c = mc(aRot);
-        let s = ms(aRot);
+    setM(this, matrixMultiply(m1, this.m_), false);
+  }
 
-        let m1 = [
-            [c, s, 0],
-            [-s, c, 0],
-            [0, 0, 1]
-        ];
+  rotate(aRot: number) {
+    let c = mc(aRot);
+    let s = ms(aRot);
 
-        setM(this, matrixMultiply(m1, this.m_), false);
-    }
+    let m1 = [
+      [c, s, 0],
+      [-s, c, 0],
+      [0, 0, 1]
+    ];
 
-    scale(aX: number, aY: number) {
-        this.arcScaleX_ *= aX;
-        this.arcScaleY_ *= aY;
-        let m1 = [
-            [aX, 0, 0],
-            [0, aY, 0],
-            [0, 0, 1]
-        ];
+    setM(this, matrixMultiply(m1, this.m_), false);
+  }
 
-        setM(this, matrixMultiply(m1, this.m_), true);
-    }
+  scale(aX: number, aY: number) {
+    this.arcScaleX_ *= aX;
+    this.arcScaleY_ *= aY;
+    let m1 = [
+      [aX, 0, 0],
+      [0, aY, 0],
+      [0, 0, 1]
+    ];
 
-    transform(m11: number, m12: number, m21: number, m22: number, dx: number, dy: number) {
-        let m1 = [
-            [m11, m12, 0],
-            [m21, m22, 0],
-            [dx, dy, 1]
-        ];
+    setM(this, matrixMultiply(m1, this.m_), true);
+  }
 
-        setM(this, matrixMultiply(m1, this.m_), true);
-    }
+  transform(m11: number, m12: number, m21: number, m22: number, dx: number, dy: number) {
+    let m1 = [
+      [m11, m12, 0],
+      [m21, m22, 0],
+      [dx, dy, 1]
+    ];
 
-    setTransform(m11: number, m12: number, m21: number, m22: number, dx: number, dy: number) {
-        let m = [
-            [m11, m12, 0],
-            [m21, m22, 0],
-            [dx, dy, 1]
-        ];
+    setM(this, matrixMultiply(m1, this.m_), true);
+  }
 
-        setM(this, m, true);
-    }
+  setTransform(m11: number, m12: number, m21: number, m22: number, dx: number, dy: number) {
+    let m = [
+      [m11, m12, 0],
+      [m21, m22, 0],
+      [dx, dy, 1]
+    ];
 
-    clip () {}
-    arcTo () {}
+    setM(this, m, true);
+  }
 
-    createPattern () {
-      return new CanvasPattern_();
-    }
+  clip () {}
+  arcTo () {}
+
+  createPattern () {
+    return new CanvasPattern_();
+  }
 }

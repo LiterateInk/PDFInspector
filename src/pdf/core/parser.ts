@@ -17,7 +17,7 @@ export class Parser {
     buf1: any;
     buf2: any;
     streamPos: number;
-  }
+  };
 
   constructor (
     public lexer: Lexer,
@@ -49,36 +49,37 @@ export class Parser {
   }
 
   shift () {
-    if (isCmd(this.buf2, 'ID')) {
+    if (isCmd(this.buf2, "ID")) {
       this.buf1 = this.buf2;
       this.buf2 = null;
-    } else {
+    }
+    else {
       this.buf1 = this.buf2;
       this.buf2 = this.lexer.getObj();
     }
   }
 
   getObj (): any {
-    if (isCmd(this.buf1, 'BI')) { // inline image
+    if (isCmd(this.buf1, "BI")) { // inline image
       this.shift();
       return this.makeInlineImage();
     }
-    if (isCmd(this.buf1, '[')) { // array
+    if (isCmd(this.buf1, "[")) { // array
       this.shift();
       const array = [];
-      while (!isCmd(this.buf1, ']') && !isEOF(this.buf1))
+      while (!isCmd(this.buf1, "]") && !isEOF(this.buf1))
         array.push(this.getObj());
       if (isEOF(this.buf1))
-        throw new Error('End of file inside array');
+        throw new Error("End of file inside array");
       this.shift();
       return array;
     }
-    if (isCmd(this.buf1, '<<')) { // dictionary or stream
+    if (isCmd(this.buf1, "<<")) { // dictionary or stream
       this.shift();
       const dict = new Dict(this.xref!);
-      while (!isCmd(this.buf1, '>>') && !isEOF(this.buf1)) {
+      while (!isCmd(this.buf1, ">>") && !isEOF(this.buf1)) {
         if (!isName(this.buf1)) {
-          console.info('malformed dictionary, key must be a name object');
+          console.info("malformed dictionary, key must be a name object");
           this.shift();
           continue;
         }
@@ -90,11 +91,11 @@ export class Parser {
         dict.set(key, this.getObj());
       }
       if (isEOF(this.buf1))
-        throw new Error('end of file inside dictionary');
+        throw new Error("end of file inside dictionary");
 
       // Stream objects are not allowed inside content streams or
       // object streams.
-      if (isCmd(this.buf2, 'stream')) {
+      if (isCmd(this.buf2, "stream")) {
         return this.allowStreams ?
           this.makeStream(dict) : dict;
       }
@@ -104,7 +105,7 @@ export class Parser {
     if (isInt(this.buf1)) { // indirect reference or integer
       const num = this.buf1;
       this.shift();
-      if (isInt(this.buf1) && isCmd(this.buf2, 'R')) {
+      if (isInt(this.buf1) && isCmd(this.buf2, "R")) {
         var ref = new Ref(num, this.buf1);
         this.shift();
         this.shift();
@@ -130,9 +131,9 @@ export class Parser {
 
     // parse dictionary
     var dict = new Dict();
-    while (!isCmd(this.buf1, 'ID') && !isEOF(this.buf1)) {
+    while (!isCmd(this.buf1, "ID") && !isEOF(this.buf1)) {
       if (!isName(this.buf1))
-        throw new Error('Dictionary key must be a name object');
+        throw new Error("Dictionary key must be a name object");
 
       var key = this.buf1.name;
       this.shift();
@@ -180,7 +181,7 @@ export class Parser {
     imageStream = this.filter(imageStream, dict, length);
     imageStream.dict = dict;
 
-    this.buf2 = Cmd.get('EI');
+    this.buf2 = Cmd.get("EI");
     this.shift();
 
     return imageStream;
@@ -200,9 +201,9 @@ export class Parser {
     var pos = stream.pos - 1;
 
     // get length
-    var length = this.fetchIfRef(dict.get('Length'));
+    var length = this.fetchIfRef(dict.get("Length"));
     if (!isInt(length)) {
-      console.info('Bad ' + length + ' attribute in stream');
+      console.info("Bad " + length + " attribute in stream");
       length = 0;
     }
 
@@ -212,13 +213,13 @@ export class Parser {
 
     this.shift(); // '>>'
     this.shift(); // 'stream'
-    if (!isCmd(this.buf1, 'endstream')) {
+    if (!isCmd(this.buf1, "endstream")) {
       // bad stream length, scanning for endstream
       stream.pos = pos;
       var SCAN_BLOCK_SIZE = 2048;
       var ENDSTREAM_SIGNATURE_LENGTH = 9;
       var ENDSTREAM_SIGNATURE = [0x65, 0x6E, 0x64, 0x73, 0x74, 0x72, 0x65,
-                                  0x61, 0x6D];
+        0x61, 0x6D];
       var skipped = 0, found = false;
       while (stream.pos < stream.end) {
         var scanBytes = stream.peekBytes(SCAN_BLOCK_SIZE);
@@ -229,7 +230,8 @@ export class Parser {
           if (b !== ENDSTREAM_SIGNATURE[j]) {
             i -= j;
             j = 0;
-          } else {
+          }
+          else {
             j++;
             if (j >= ENDSTREAM_SIGNATURE_LENGTH) {
               found = true;
@@ -246,7 +248,7 @@ export class Parser {
         stream.pos += scanLength;
       }
       if (!found) {
-        throw new Error('Missing endstream');
+        throw new Error("Missing endstream");
       }
       length = skipped;
 
@@ -264,8 +266,8 @@ export class Parser {
 
   // @ts-expect-error
   filter (stream, dict, length) {
-    var filter = this.fetchIfRef(dict.get('Filter', 'F'));
-    var params = this.fetchIfRef(dict.get('DecodeParms', 'DP'));
+    var filter = this.fetchIfRef(dict.get("Filter", "F"));
+    var params = this.fetchIfRef(dict.get("DecodeParms", "DP"));
     if (isName(filter))
       return this.makeFilter(stream, filter.name, length, params);
     if (isArray(filter)) {
@@ -274,7 +276,7 @@ export class Parser {
       for (var i = 0, ii = filterArray.length; i < ii; ++i) {
         filter = filterArray[i];
         if (!isName(filter))
-          throw new Error('Bad filter name: ' + filter);
+          throw new Error("Bad filter name: " + filter);
 
         params = null;
         if (isArray(paramsArray) && (i in paramsArray))
@@ -289,14 +291,14 @@ export class Parser {
 
   // @ts-expect-error
   makeFilter (stream, name, length, params) {
-    if (stream.dict.get('Length') === 0) {
+    if (stream.dict.get("Length") === 0) {
       return new NullStream();
     }
-    if (name == 'FlateDecode' || name == 'Fl') {
+    if (name == "FlateDecode" || name == "Fl") {
       return new FlateStream(stream);
     }
-    
-    console.warn('filter "' + name + '" not supported yet');
+
+    console.warn("filter \"" + name + "\" not supported yet");
     return stream;
   }
 }
@@ -368,73 +370,78 @@ export class Lexer {
     var str = String.fromCharCode(ch);
     while ((ch = this.nextChar()) >= 0) {
       if (ch === 0x2E && !floating) { // '.'
-        str += '.';
+        str += ".";
         floating = true;
-      } else if (ch === 0x2D) { // '-'
+      }
+      else if (ch === 0x2D) { // '-'
         // ignore minus signs in the middle of numbers to match
         // Adobe's behavior
-        console.warn('Badly formated number');
-      } else if (ch >= 0x30 && ch <= 0x39) { // '0'-'9'
+        console.warn("Badly formated number");
+      }
+      else if (ch >= 0x30 && ch <= 0x39) { // '0'-'9'
         str += String.fromCharCode(ch);
-      } else if (ch === 0x45 || ch === 0x65) { // 'E', 'e'
+      }
+      else if (ch === 0x45 || ch === 0x65) { // 'E', 'e'
         floating = true;
-      } else {
+      }
+      else {
         // the last character doesn't belong to us
         break;
       }
     }
     var value = parseFloat(str);
     if (isNaN(value))
-      throw new Error('Invalid floating point number: ' + value);
+      throw new Error("Invalid floating point number: " + value);
     return value;
   }
 
   getString () {
     var numParen = 1;
     var done = false;
-    var str = '';
+    var str = "";
 
     var ch = this.nextChar();
     while (true) {
       var charBuffered = false;
       switch (ch | 0) {
         case -1:
-          console.warn('Unterminated string');
+          console.warn("Unterminated string");
           done = true;
           break;
         case 0x28: // '('
           ++numParen;
-          str += '(';
+          str += "(";
           break;
         case 0x29: // ')'
           if (--numParen === 0) {
             this.nextChar(); // consume strings ')'
             done = true;
-          } else {
-            str += ')';
+          }
+          else {
+            str += ")";
           }
           break;
         case 0x5C: // '\\'
           ch = this.nextChar();
           switch (ch) {
             case -1:
-              console.warn('Unterminated string');
+              console.warn("Unterminated string");
               done = true;
               break;
             case 0x6E: // 'n'
-              str += '\n';
+              str += "\n";
               break;
             case 0x72: // 'r'
-              str += '\r';
+              str += "\r";
               break;
             case 0x74: // 't'
-              str += '\t';
+              str += "\t";
               break;
             case 0x62: // 'b'
-              str += '\b';
+              str += "\b";
               break;
             case 0x66: // 'f'
-              str += '\f';
+              str += "\f";
               break;
             case 0x5C: // '\'
             case 0x28: // '('
@@ -479,22 +486,22 @@ export class Lexer {
   }
 
   getName () {
-    let str = '';
+    let str = "";
     let ch;
 
     while ((ch = this.nextChar()) >= 0 && !Lexer.specialChars[ch]) {
       if (ch === 0x23) { // '#'
         ch = this.nextChar();
         const x = Lexer.toHexDigit(ch);
-        
+
         if (x != -1) {
           const x2 = Lexer.toHexDigit(this.nextChar());
           if (x2 == -1)
-            throw new Error('Illegal digit in hex char in name: ' + x2);
+            throw new Error("Illegal digit in hex char in name: " + x2);
           str += String.fromCharCode((x << 4) | x2);
         }
         else {
-          str += '#';
+          str += "#";
           str += String.fromCharCode(ch);
         }
       }
@@ -502,23 +509,23 @@ export class Lexer {
         str += String.fromCharCode(ch);
       }
     }
-    
+
     if (str.length > 127) {
-      console.warn('Name token is longer than allowed by the spec: ' + str.length);
+      console.warn("Name token is longer than allowed by the spec: " + str.length);
     }
 
     return new Name(str);
   }
 
   getHexString () {
-    let str = '';
+    let str = "";
     let ch = this.currentChar!;
     let isFirstHex = true;
     let firstDigit;
 
     while (true) {
       if (ch < 0) {
-        console.warn('Unterminated hex string');
+        console.warn("Unterminated hex string");
         break;
       }
       else if (ch === 0x3E) { // '>'
@@ -533,7 +540,7 @@ export class Lexer {
         if (isFirstHex) {
           firstDigit = Lexer.toHexDigit(ch);
           if (firstDigit === -1) {
-            console.warn('Ignoring invalid character "' + ch + '" in hex string');
+            console.warn("Ignoring invalid character \"" + ch + "\" in hex string");
             ch = this.nextChar();
             continue;
           }
@@ -541,7 +548,7 @@ export class Lexer {
         else {
           const secondDigit = Lexer.toHexDigit(ch);
           if (secondDigit === -1) {
-            console.warn('Ignoring invalid character "' + ch + '" in hex string');
+            console.warn("Ignoring invalid character \"" + ch + "\" in hex string");
             ch = this.nextChar();
             continue;
           }
@@ -574,7 +581,7 @@ export class Lexer {
       else if (Lexer.specialChars[ch] !== 1) {
         break;
       }
-      
+
       ch = this.nextChar();
     }
 
@@ -591,17 +598,17 @@ export class Lexer {
       // array punctuation
       case 0x5B: // '['
         this.nextChar();
-        return Cmd.get('[');
+        return Cmd.get("[");
       case 0x5D: // ']'
         this.nextChar();
-        return Cmd.get(']');
+        return Cmd.get("]");
       // hex string or dict punctuation
       case 0x3C: // '<'
         ch = this.nextChar();
         if (ch === 0x3C) {
           // dict punctuation
           this.nextChar();
-          return Cmd.get('<<');
+          return Cmd.get("<<");
         }
         return this.getHexString();
       // dict punctuation
@@ -609,17 +616,17 @@ export class Lexer {
         ch = this.nextChar();
         if (ch === 0x3E) {
           this.nextChar();
-          return Cmd.get('>>');
+          return Cmd.get(">>");
         }
-        return Cmd.get('>');
+        return Cmd.get(">");
       case 0x7B: // '{'
         this.nextChar();
-        return Cmd.get('{');
+        return Cmd.get("{");
       case 0x7D: // '}'
         this.nextChar();
-        return Cmd.get('}');
+        return Cmd.get("}");
       case 0x29: // ')'
-        throw new Error('Illegal character: ' + ch);
+        throw new Error("Illegal character: " + ch);
     }
 
     // command
@@ -635,15 +642,15 @@ export class Lexer {
       }
 
       if (str.length == 128)
-        throw new Error('Command token too long: ' + str.length);
+        throw new Error("Command token too long: " + str.length);
       str = possibleCommand;
       knownCommandFound = knownCommands && (str in knownCommands);
     }
-    if (str == 'true')
+    if (str == "true")
       return true;
-    if (str == 'false')
+    if (str == "false")
       return false;
-    if (str == 'null')
+    if (str == "null")
       return null;
     return Cmd.get(str);
   }

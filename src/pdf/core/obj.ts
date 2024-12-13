@@ -32,13 +32,13 @@ export class Dict {
   get (key1: string, key2?: string, key3?: string): XRef | undefined {
     var value;
     var xref = this.xref;
-    if (typeof (value = this.map[key1]) != 'undefined' || key1 in this.map ||
-        typeof key2 == 'undefined') {
+    if (typeof (value = this.map[key1]) != "undefined" || key1 in this.map ||
+        typeof key2 == "undefined") {
       // @ts-expect-error
       return xref ? xref.fetchIfRef(value) : value;
     }
-    if (typeof (value = this.map[key2]) != 'undefined' || key2 in this.map ||
-        typeof key3 == 'undefined') {
+    if (typeof (value = this.map[key2]) != "undefined" || key2 in this.map ||
+        typeof key3 == "undefined") {
       // @ts-expect-error
       return xref ? xref.fetchIfRef(value) : value;
     }
@@ -87,13 +87,13 @@ export class Dict {
   // creates new map and dereferences all Refs
   getAll () {
     const all: Record<string, XRef> = {};
-    
+
     for (const key in this.map) {
       const obj = this.get(key);
       // @ts-expect-error
       all[key] = obj instanceof Dict ? obj.getAll() : obj;
     }
-    
+
     return all;
   }
 
@@ -127,15 +127,15 @@ export class RefSet {
   public dict: Record<string, boolean> = {};
 
   has (ref: Ref): boolean {
-    return ('R' + ref.num + '.' + ref.gen) in this.dict;
+    return ("R" + ref.num + "." + ref.gen) in this.dict;
   }
 
   put (ref: Ref): void {
-    this.dict['R' + ref.num + '.' + ref.gen] = true;
+    this.dict["R" + ref.num + "." + ref.gen] = true;
   }
-  
+
   remove (ref: Ref): void {
-    delete this.dict['R' + ref.num + '.' + ref.gen];
+    delete this.dict["R" + ref.num + "." + ref.gen];
   }
 }
 
@@ -148,22 +148,22 @@ export class RefSetCache {
   // @ts-expect-error
   get (ref) {
     // @ts-expect-error
-    return this.dict['R' + ref.num + '.' + ref.gen];
+    return this.dict["R" + ref.num + "." + ref.gen];
   }
-  
+
   // @ts-expect-error
   has (ref) {
     //MQZ. 03/08/2016 fix https://github.com/modesty/pdf2json/issues/26
     // @ts-expect-error
-    return !!ref ? ('R' + ref.num + '.' + ref.gen) in this.dict : false;
+    return !!ref ? ("R" + ref.num + "." + ref.gen) in this.dict : false;
   }
-  
+
   // @ts-expect-error
   put (ref, obj) {
     // @ts-expect-error
-    this.dict['R' + ref.num + '.' + ref.gen] = obj;
+    this.dict["R" + ref.num + "." + ref.gen] = obj;
   }
-  
+
   // @ts-expect-error
   forEach (fn, thisArg) {
     // @ts-expect-error
@@ -172,7 +172,7 @@ export class RefSetCache {
       fn.call(thisArg, this.dict[i]);
     }
   }
-  
+
   clear () {
     // @ts-expect-error
     this.dict = Object.create(null);
@@ -186,29 +186,29 @@ export class Catalog {
     // @ts-expect-error
     this.fontCache = new RefSetCache();
     // @ts-expect-error
-    assert(isDict(this.catDict), 'catalog object is not a dictionary');
-    
+    assert(isDict(this.catDict), "catalog object is not a dictionary");
+
     // @ts-expect-error
     this.pagePromises = [];
   }
 
   get metadata() {
     // @ts-expect-error
-    var streamRef = this.catDict.getRaw('Metadata');
+    var streamRef = this.catDict.getRaw("Metadata");
     if (!isRef(streamRef))
-      return shadow(this, 'metadata', null);
+      return shadow(this, "metadata", null);
 
     var stream = this.xref.fetch(streamRef);
     var metadata;
     // @ts-expect-error
     if (stream && isDict(stream.dict)) {
       // @ts-expect-error
-      var type = stream.dict.get('Type');
+      var type = stream.dict.get("Type");
       // @ts-expect-error
-      var subtype = stream.dict.get('Subtype');
+      var subtype = stream.dict.get("Subtype");
 
       if (isName(type) && isName(subtype) &&
-          type.name === 'Metadata' && subtype.name === 'XML') {
+          type.name === "Metadata" && subtype.name === "XML") {
         // XXX: This should examine the charset the XML document defines,
         // however since there are currently no real means to decode
         // arbitrary charsets, let's just hope that the author of the PDF
@@ -217,40 +217,42 @@ export class Catalog {
         // @ts-expect-error
         metadata = stringToUTF8String(bytesToString(stream.getBytes()));
         try {
-        } catch (e) {
-          console.info('Skipping invalid metadata.');
+        }
+        catch (e) {
+          console.info("Skipping invalid metadata.");
         }
       }
     }
 
-    return shadow(this, 'metadata', metadata);
+    return shadow(this, "metadata", metadata);
   }
 
   get toplevelPagesDict() {
     // @ts-expect-error
-    var pagesObj = this.catDict.get('Pages');
-    assert(isDict(pagesObj), 'invalid top-level pages dictionary');
+    var pagesObj = this.catDict.get("Pages");
+    assert(isDict(pagesObj), "invalid top-level pages dictionary");
     // shadow the prototype getter
-    return shadow(this, 'toplevelPagesDict', pagesObj);
+    return shadow(this, "toplevelPagesDict", pagesObj);
   }
 
   get documentOutline() {
     var obj = null;
     try {
       obj = this.readDocumentOutline();
-    } catch {
-      console.warn('Unable to read document outline');
     }
-    return shadow(this, 'documentOutline', obj);
+    catch {
+      console.warn("Unable to read document outline");
+    }
+    return shadow(this, "documentOutline", obj);
   }
 
   readDocumentOutline () {
     var xref = this.xref;
     // @ts-expect-error
-    var obj = this.catDict.get('Outlines');
+    var obj = this.catDict.get("Outlines");
     var root = { items: [] };
     if (isDict(obj)) {
-      obj = obj.getRaw('First');
+      obj = obj.getRaw("First");
       var processed = new RefSet();
       if (isRef(obj)) {
         var queue = [{obj: obj, parent: root}];
@@ -264,44 +266,44 @@ export class Catalog {
           if (outlineDict === null)
             continue;
           // @ts-expect-error
-          if (!outlineDict.has('Title'))
-            throw new Error('Invalid outline item');
+          if (!outlineDict.has("Title"))
+            throw new Error("Invalid outline item");
           // @ts-expect-error
-          var dest = outlineDict.get('A');
+          var dest = outlineDict.get("A");
           if (dest)
-            dest = dest.get('D');
+            dest = dest.get("D");
           // @ts-expect-error
-          else if (outlineDict.has('Dest')) {
+          else if (outlineDict.has("Dest")) {
             // @ts-expect-error
-            dest = outlineDict.getRaw('Dest');
+            dest = outlineDict.getRaw("Dest");
             if (isName(dest))
               dest = dest.name;
           }
           // @ts-expect-error
-          var title = outlineDict.get('Title');
+          var title = outlineDict.get("Title");
           var outlineItem = {
             dest: dest,
             title: stringToPDFString(title),
             // @ts-expect-error
-            color: outlineDict.get('C') || [0, 0, 0],
+            color: outlineDict.get("C") || [0, 0, 0],
             // @ts-expect-error
-            count: outlineDict.get('Count'),
+            count: outlineDict.get("Count"),
             // @ts-expect-error
-            bold: !!(outlineDict.get('F') & 2),
+            bold: !!(outlineDict.get("F") & 2),
             // @ts-expect-error
-            italic: !!(outlineDict.get('F') & 1),
+            italic: !!(outlineDict.get("F") & 1),
             items: []
           };
           // @ts-expect-error
           i.parent.items.push(outlineItem);
           // @ts-expect-error
-          obj = outlineDict.getRaw('First');
+          obj = outlineDict.getRaw("First");
           if (isRef(obj) && !processed.has(obj)) {
             queue.push({obj: obj, parent: outlineItem});
             processed.put(obj);
           }
           // @ts-expect-error
-          obj = outlineDict.getRaw('Next');
+          obj = outlineDict.getRaw("Next");
           if (isRef(obj) && !processed.has(obj)) {
             // @ts-expect-error
             queue.push({obj: obj, parent: i.parent});
@@ -314,13 +316,13 @@ export class Catalog {
   }
 
   get numPages() {
-    var obj = this.toplevelPagesDict.get('Count');
+    var obj = this.toplevelPagesDict.get("Count");
     assert(
       isInt(obj),
-      'page count in top level pages object is not an integer'
+      "page count in top level pages object is not an integer"
     );
     // shadow the prototype getter
-    return shadow(this, 'num', obj);
+    return shadow(this, "num", obj);
   }
 
   cleanup () {
@@ -342,7 +344,7 @@ export class Catalog {
         const dict = a[0];
         // @ts-expect-error
         const ref = a[1];
-        
+
         return new Page(this.pdfManager, this.xref, pageIndex, dict, ref,
           // @ts-expect-error
           this.fontCache);
@@ -356,21 +358,22 @@ export class Catalog {
   getPageDict (pageIndex: number) {
     return new Promise((resolve, reject) => {
       // @ts-expect-error
-      var nodesToVisit = [this.catDict.getRaw('Pages')];
+      var nodesToVisit = [this.catDict.getRaw("Pages")];
       var currentPageIndex = 0;
       var xref = this.xref;
-  
+
       async function next() {
         while (nodesToVisit.length) {
           var currentNode = nodesToVisit.pop();
-  
+
           if (isRef(currentNode)) {
             const obj = await xref.fetchAsync(currentNode).catch(reject);
 
-            if ((isDict(obj, 'Page') || (isDict(obj) && !obj.has('Kids')))) {
+            if ((isDict(obj, "Page") || (isDict(obj) && !obj.has("Kids")))) {
               if (pageIndex === currentPageIndex) {
                 resolve([obj, currentNode]);
-              } else {
+              }
+              else {
                 currentPageIndex++;
                 next();
               }
@@ -380,21 +383,21 @@ export class Catalog {
             next();
             return;
           }
-  
+
           // must be a child page dictionary
           assert(
             isDict(currentNode),
-            'page dictionary kid reference points to wrong type of object'
+            "page dictionary kid reference points to wrong type of object"
           );
-          const count = currentNode.get('Count');
+          const count = currentNode.get("Count");
           // Skip nodes where the page can't be.
           if (currentPageIndex + count <= pageIndex) {
             currentPageIndex += count;
             continue;
           }
-  
-          const kids = currentNode.get('Kids');
-          assert(isArray(kids), 'page dictionary kids object is not an array');
+
+          const kids = currentNode.get("Kids");
+          assert(isArray(kids), "page dictionary kids object is not an array");
           if (count === kids.length) {
             // Nodes that don't have the page have been skipped and this is the
             // bottom of the tree which means the page requested must be a
@@ -406,18 +409,19 @@ export class Catalog {
             nodesToVisit = [kids[pageIndex - currentPageIndex]];
             currentPageIndex = pageIndex;
             continue;
-          } else {
+          }
+          else {
             for (var last = kids.length - 1; last >= 0; last--) {
               nodesToVisit.push(kids[last]);
             }
           }
         }
 
-        reject('Page index ' + pageIndex + ' not found.');
+        reject("Page index " + pageIndex + " not found.");
       }
 
       next();
-    })
+    });
   }
 }
 
@@ -435,7 +439,7 @@ export class XRef {
   public topDict?: Dict;
   public trailer?: Dict;
   public root?: XRef;
-  
+
   constructor (public stream: Stream) {
     this.entries = [];
     this.cache = [];
@@ -449,14 +453,14 @@ export class XRef {
 
   parse (recoveryMode: boolean): void {
     let trailerDict: Dict | undefined;
-    
+
     if (!recoveryMode) {
       trailerDict = this.readXRef();
     }
 
     trailerDict?.assignXref(this);
     this.trailer = trailerDict;
-    this.root = trailerDict?.get('Root')
+    this.root = trailerDict?.get("Root");
   }
 
   public tableState?: {
@@ -466,7 +470,7 @@ export class XRef {
     parserBuf2: number,
     firstEntryNum?: number,
     entryCount?: number
-  }
+  };
 
   processXRefTable (parser: Parser): Dict {
     if (!this.tableState) {
@@ -483,8 +487,8 @@ export class XRef {
     const obj = this.readXRefTable(parser);
 
     // Sanity check
-    if (!isCmd(obj, 'trailer'))
-      throw new Error('Invalid XRef table: could not find trailer dictionary');
+    if (!isCmd(obj, "trailer"))
+      throw new Error("Invalid XRef table: could not find trailer dictionary");
 
     // Read trailer dictionary, e.g.
     // trailer
@@ -497,7 +501,7 @@ export class XRef {
     // a getter interface for the key-value table
     const dict = parser.getObj();
     if (!isDict(dict))
-      throw new Error('Invalid XRef table: could not parse trailer dictionary');
+      throw new Error("Invalid XRef table: could not parse trailer dictionary");
 
     delete this.tableState;
     return dict;
@@ -525,8 +529,8 @@ export class XRef {
     let first: number | undefined;
 
     while (true) {
-      if (!('firstEntryNum' in tableState) || !('entryCount' in tableState)) {
-        if (isCmd(obj = parser.getObj(), 'trailer')) {
+      if (!("firstEntryNum" in tableState) || !("entryCount" in tableState)) {
+        if (isCmd(obj = parser.getObj(), "trailer")) {
           break;
         }
         tableState.firstEntryNum = obj;
@@ -536,7 +540,7 @@ export class XRef {
       first = tableState.firstEntryNum;
       const count = tableState.entryCount;
       if (!isInt(first) || !isInt(count))
-        throw new Error('Invalid XRef table: wrong types in subsection header');
+        throw new Error("Invalid XRef table: wrong types in subsection header");
 
       // Inner loop is over objects themselves
       for (let i = tableState.entryNum; i < count; i++) {
@@ -552,14 +556,14 @@ export class XRef {
 
         const type = parser.getObj();
 
-        if (isCmd(type, 'f'))
+        if (isCmd(type, "f"))
           entry.free = true;
-        else if (isCmd(type, 'n'))
+        else if (isCmd(type, "n"))
           entry.uncompressed = true;
 
         // Validate entry obj
         if (!isInt(entry.offset) || !isInt(entry.gen) || !(entry.free || entry.uncompressed)) {
-          throw new Error('Invalid entry in XRef subsection: ' + first + ', ' + count);
+          throw new Error("Invalid entry in XRef subsection: " + first + ", " + count);
         }
 
         if (!this.entries[i + first])
@@ -582,7 +586,7 @@ export class XRef {
 
     // Sanity check: as per spec, first object must be free
     if (this.entries[0] && !(this.entries[0] as XRefEntry).free)
-      throw new Error('Invalid XRef table: unexpected first object');
+      throw new Error("Invalid XRef table: unexpected first object");
 
     return obj;
   }
@@ -598,7 +602,7 @@ export class XRef {
       const obj = parser.getObj();
 
       // Get dictionary
-      if (isCmd(obj, 'xref')) {
+      if (isCmd(obj, "xref")) {
         // Parse end-of-file XRef
         const dict = this.processXRefTable(parser);
         if (!this.topDict) {
@@ -606,7 +610,7 @@ export class XRef {
         }
       }
       else {
-        throw new Error('Invalid XRef stream header');
+        throw new Error("Invalid XRef stream header");
       }
 
       this.startXRefQueue.shift();
@@ -635,9 +639,9 @@ export class XRef {
 
   fetch (ref: Ref): Dict | XRefEntry | number | null {
     if (!(ref instanceof Ref)) {
-      throw new Error('ref object is not a reference');
+      throw new Error("ref object is not a reference");
     }
-  
+
     let num = ref.num;
     let e: Dict | XRefEntry | null;
 
@@ -653,11 +657,11 @@ export class XRef {
       return (this.cache[num] = e);
 
     if (e.gen != ref.gen)
-      throw new Error('inconsistent generation in XRef');
+      throw new Error("inconsistent generation in XRef");
 
     const stream = this.stream.makeSubStream(e.offset);
     const parser = new Parser(new Lexer(stream), true, this);
-    
+
     const obj1 = parser.getObj();
     const obj2 = parser.getObj();
     const obj3 = parser.getObj();
@@ -665,22 +669,22 @@ export class XRef {
     if (!isInt(obj1) || obj1 != num ||
         !isInt(obj2) || obj2 != ref.gen ||
         !isCmd(obj3)) {
-      throw new Error('bad XRef entry');
+      throw new Error("bad XRef entry");
     }
-    if (!isCmd(obj3, 'obj')) {
+    if (!isCmd(obj3, "obj")) {
       // some bad pdfs use "obj1234" and really mean 1234
-      if ((obj3 as Cmd).cmd.indexOf('obj') === 0) {
+      if ((obj3 as Cmd).cmd.indexOf("obj") === 0) {
         num = parseInt((obj3 as Cmd).cmd.substring(3), 10);
         if (!isNaN(num))
           return num;
       }
 
-      throw new Error('bad XRef entry');
+      throw new Error("bad XRef entry");
     }
-    
+
     // @ts-expect-error
     e = parser.getObj() as Dict | Stream;
-    
+
     if (!isStream(e)) {
       // @ts-expect-error
       this.cache[num] = e;
@@ -699,7 +703,7 @@ export class XRef {
   }
 
   async fetchAsync (ref: Ref) {
-    return this.fetch(ref)
+    return this.fetch(ref);
   }
 
   getCatalogObj () {

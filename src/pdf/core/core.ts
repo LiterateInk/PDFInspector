@@ -11,7 +11,7 @@ export class Page {
   public resourcesPromise: Promise<any> | null = null;
   public idCounters = {
     obj: 0
-  }
+  };
 
   constructor (
     public pdfManager: LocalPdfManager,
@@ -32,7 +32,7 @@ export class Page {
 
     while (obj === undefined) {
       // @ts-expect-error
-      dict = dict.get('Parent');
+      dict = dict.get("Parent");
       if (!dict) break;
       obj = dict.get(key);
     }
@@ -41,26 +41,26 @@ export class Page {
   }
 
   get content() {
-    return this.getPageProp('Contents');
+    return this.getPageProp("Contents");
   }
 
   get resources() {
-    return shadow(this, 'resources', this.inheritPageProp('Resources'));
+    return shadow(this, "resources", this.inheritPageProp("Resources"));
   }
 
   get mediaBox() {
-    var obj = this.inheritPageProp('MediaBox') as unknown as number[];
+    var obj = this.inheritPageProp("MediaBox") as unknown as number[];
     // Reset invalid media box to letter size.
     if (!isArray(obj) || obj.length !== 4)
       obj = [0, 0, 612, 792];
-    return shadow(this, 'mediaBox', obj);
+    return shadow(this, "mediaBox", obj);
   }
 
   get view() {
     var mediaBox = this.mediaBox;
-    var cropBox = this.inheritPageProp('CropBox');
+    var cropBox = this.inheritPageProp("CropBox");
     if (!isArray(cropBox) || cropBox.length !== 4)
-      return shadow(this, 'view', mediaBox);
+      return shadow(this, "view", mediaBox);
 
     // From the spec, 6th ed., p.963:
     // "The crop, bleed, trim, and art boxes should not ordinarily
@@ -69,25 +69,27 @@ export class Page {
     // @ts-expect-error
     cropBox = Util.intersect(cropBox, mediaBox);
     if (!cropBox)
-      return shadow(this, 'view', mediaBox);
+      return shadow(this, "view", mediaBox);
 
-    return shadow(this, 'view', cropBox);
+    return shadow(this, "view", cropBox);
   }
 
   get rotate() {
     // TODO
-    var rotate = this.inheritPageProp('Rotate') as unknown as number || 0;
+    var rotate = this.inheritPageProp("Rotate") as unknown as number || 0;
     // Normalize rotation so it's a multiple of 90 and between 0 and 270
     if (rotate % 90 !== 0) {
       rotate = 0;
-    } else if (rotate >= 360) {
+    }
+    else if (rotate >= 360) {
       rotate = rotate % 360;
-    } else if (rotate < 0) {
+    }
+    else if (rotate < 0) {
       // The spec doesn't cover negatives, assume its counterclockwise
       // rotation. The following is the other implementation of modulo.
       rotate = ((rotate % 360) + 360) % 360;
     }
-    return shadow(this, 'rotate', rotate);
+    return shadow(this, "rotate", rotate);
   }
 
   getContentStream (): Stream {
@@ -103,9 +105,9 @@ export class Page {
   async loadResources (keys: string[]) {
     if (!this.resourcesPromise) {
       // TODO: add async inheritPageProp and remove this.
-      this.resourcesPromise = this.pdfManager.ensure(this, 'resources');
+      this.resourcesPromise = this.pdfManager.ensure(this, "resources");
     }
-    
+
     // empty page
     if (!this.resources) return;
     await this.resourcesPromise;
@@ -121,21 +123,21 @@ export class Page {
 
   async getOperatorList (handler: WorkerTransport) {
     const contentStreamPromise = this.pdfManager.ensure(
-      this, 'getContentStream', []
+      this, "getContentStream", []
     );
 
     const resourcesPromise = this.loadResources([
-      'ExtGState',
-      'ColorSpace',
-      'Pattern',
-      'Shading',
-      'XObject',
-      'Font'
+      "ExtGState",
+      "ColorSpace",
+      "Pattern",
+      "Shading",
+      "XObject",
+      "Font"
     ]);
 
     const partialEvaluator = new PartialEvaluator(
       this.pdfManager, this.xref, handler,
-      this.pageIndex, 'p' + this.pageIndex + '_',
+      this.pageIndex, "p" + this.pageIndex + "_",
       this.idCounters, this.fontCache
     );
 
@@ -160,7 +162,7 @@ export const DocumentInfoValidators = {
   get entries () {
     // Lazily build this since all the validation functions below are not
     // defined until after this file loads.
-    return shadow(this, 'entries', {
+    return shadow(this, "entries", {
       Title: isString,
       Author: isString,
       Subject: isString,
@@ -192,13 +194,13 @@ export class PDFDocument {
     arg: Stream | ArrayBuffer
   ) {
     if (isStream(arg)) {
-      assert(arg.length > 0, 'stream must have data')
+      assert(arg.length > 0, "stream must have data");
       this.stream = arg;
     }
     else if (isArrayBuffer(arg)) {
-      this.stream = new Stream(arg)
+      this.stream = new Stream(arg);
     }
-    else throw new Error('PDFDocument: Unknown argument type');
+    else throw new Error("PDFDocument: Unknown argument type");
 
     this.xref = new XRef(this.stream);
   }
@@ -206,7 +208,7 @@ export class PDFDocument {
   private static find (stream: Stream, needle: string, limit: number, backwards?: boolean): boolean {
     var pos = stream.pos;
     var end = stream.end;
-    var str = '';
+    var str = "";
     if (pos + limit > end)
       limit = end - pos;
     for (var n = 0; n < limit; ++n)
@@ -225,7 +227,7 @@ export class PDFDocument {
 
   get linearization() {
     // shadow the prototype getter with a data property
-    return shadow(this, 'linearization', false);
+    return shadow(this, "linearization", false);
   }
 
   get startXRef () {
@@ -238,11 +240,11 @@ export class PDFDocument {
     let pos = stream.end;
 
     while (!found && pos > 0) {
-      pos -= step - 'startxref'.length;
+      pos -= step - "startxref".length;
       if (pos < 0)
         pos = 0;
       stream.pos = pos;
-      found = PDFDocument.find(stream, 'startxref', step, true);
+      found = PDFDocument.find(stream, "startxref", step, true);
     }
 
     if (found) {
@@ -252,9 +254,9 @@ export class PDFDocument {
       do {
         ch = stream.getByte();
       } while (Lexer.isSpace(ch));
-      
-      let str = '';
-      
+
+      let str = "";
+
       while (ch >= 0x20 && ch <= 0x39) { // < '9'
         str += String.fromCharCode(ch);
         ch = stream.getByte();
@@ -267,12 +269,12 @@ export class PDFDocument {
     }
 
     // shadow the prototype getter with a data property
-    return shadow(this, 'startXRef', startXRef);
+    return shadow(this, "startXRef", startXRef);
   }
 
   get mainXRefEntriesOffset () {
     // shadow the prototype getter with a data property
-    return shadow(this, 'mainXRefEntriesOffset', 0);
+    return shadow(this, "mainXRefEntriesOffset", 0);
   }
 
   // Find the header, remove leading garbage and setup the stream
@@ -280,12 +282,12 @@ export class PDFDocument {
   checkHeader (): void {
     var stream = this.stream;
     stream.reset();
-    if (PDFDocument.find(stream, '%PDF-', 1024)) {
+    if (PDFDocument.find(stream, "%PDF-", 1024)) {
       // Found the header, trim off any garbage before it.
       stream.moveStart();
       // Reading file format version
       var MAX_VERSION_LENGTH = 12;
-      var version = '', ch;
+      var version = "", ch;
       while ((ch = stream.getByte()) > 0x20) { // SPACE
         if (version.length >= MAX_VERSION_LENGTH) {
           break;
@@ -311,7 +313,7 @@ export class PDFDocument {
 
   get numPages (): number {
     // shadow the prototype getter
-    return shadow(this, 'numPages', this.catalog!.numPages);
+    return shadow(this, "numPages", this.catalog!.numPages);
   }
 
   get documentInfo () {
@@ -319,10 +321,10 @@ export class PDFDocument {
     let infoDict;
 
     try {
-      infoDict = this.xref.trailer?.get('Info');
+      infoDict = this.xref.trailer?.get("Info");
     }
     catch (err) {
-      console.info('the document information dictionary is invalid.');
+      console.info("the document information dictionary is invalid.");
     }
 
     if (infoDict) {
@@ -336,24 +338,25 @@ export class PDFDocument {
           // Make sure the value conforms to the spec.
           if (validEntries[key](value)) {
             // @ts-expect-error
-            docInfo[key] = typeof value !== 'string' ? value :
+            docInfo[key] = typeof value !== "string" ? value :
               stringToPDFString(value);
-          } else {
-            console.info('Bad value in document info for "' + key + '"');
+          }
+          else {
+            console.info("Bad value in document info for \"" + key + "\"");
           }
         }
       }
     }
 
-    return shadow(this, 'documentInfo', docInfo);
+    return shadow(this, "documentInfo", docInfo);
   }
 
   get fingerprint() {
-    var xref = this.xref, hash, fileID = '';
+    var xref = this.xref, hash, fileID = "";
 
-    if (xref.trailer!.has('ID')) {
+    if (xref.trailer!.has("ID")) {
       // @ts-expect-error
-      hash = stringToBytes(xref.trailer.get('ID')[0]);
+      hash = stringToBytes(xref.trailer.get("ID")[0]);
     }
 
     // @ts-expect-error
@@ -362,7 +365,7 @@ export class PDFDocument {
       fileID += hash[i].toString(16);
     }
 
-    return shadow(this, 'fingerprint', fileID);
+    return shadow(this, "fingerprint", fileID);
   }
 
 

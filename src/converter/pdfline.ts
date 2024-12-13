@@ -49,34 +49,34 @@ export default class PDFLine {
     const colorObj = (clrId > 0 && clrId < PDFUnit.colorCount()) ? { clr: clrId } : { oc: this.color };
     oneLine = { ...oneLine, ...colorObj };
 
-        //MQZ Aug.29 dashed line support
-        if (this.dashed) {
-            oneLine = oneLine = {...oneLine, dsh: 1};
-        }
-
-        if ((yDelta < this.lineWidth) && (xDelta > minDelta)) { //HLine
-            if (this.lineWidth < 4 && (xDelta / this.lineWidth < 4)) {
-                return; //skip short thick lines, like PA SPP lines behinds checkbox
-            }
-
-            oneLine.l = xDelta;
-            if (this.x1 > this.x2)
-                this.#setStartPoint(oneLine, this.x2, this.y2);
-            else
-                this.#setStartPoint(oneLine, this.x1, this.y1);
-            targetData.HLines.push(oneLine);
-        }
-        else if ((xDelta < this.lineWidth) && (yDelta > minDelta)) {//VLine
-            if (this.lineWidth < 4 && (yDelta / this.lineWidth < 4)) {
-                return; //skip short think lines, like PA SPP lines behinds checkbox
-            }
-
-            oneLine.l = yDelta;
-            if (this.y1 > this.y2)
-                this.#setStartPoint(oneLine, this.x2, this.y2);
-            else
-                this.#setStartPoint(oneLine, this.x1, this.y1);
-            targetData.VLines.push(oneLine);
-        }
+    //MQZ Aug.29 dashed line support
+    if (this.dashed) {
+      oneLine = oneLine = {...oneLine, dsh: 1};
     }
+
+    if ((yDelta < this.lineWidth) && (xDelta > minDelta)) { //HLine
+      if (this.lineWidth < 4 && (xDelta / this.lineWidth < 4)) {
+        return; //skip short thick lines, like PA SPP lines behinds checkbox
+      }
+
+      oneLine.l = xDelta;
+      if (this.x1 > this.x2)
+        this.#setStartPoint(oneLine, this.x2, this.y2);
+      else
+        this.#setStartPoint(oneLine, this.x1, this.y1);
+      targetData.HLines.push(oneLine);
+    }
+    else if ((xDelta < this.lineWidth) && (yDelta > minDelta)) { //VLine
+      if (this.lineWidth < 4 && (yDelta / this.lineWidth < 4)) {
+        return; //skip short think lines, like PA SPP lines behinds checkbox
+      }
+
+      oneLine.l = yDelta;
+      if (this.y1 > this.y2)
+        this.#setStartPoint(oneLine, this.x2, this.y2);
+      else
+        this.#setStartPoint(oneLine, this.x1, this.y1);
+      targetData.VLines.push(oneLine);
+    }
+  }
 }

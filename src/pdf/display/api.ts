@@ -72,7 +72,7 @@ export class PDFDocumentProxy {
     // @ts-expect-error
     return this.pdfInfo.outline;
   }
-  
+
   getMetadata () {
     // @ts-expect-error
     const info = this.pdfInfo.info;
@@ -299,7 +299,7 @@ export class WorkerTransport {
     const pdfInfo = await this.customWorker.GetDocRequest({
       source: buffer,
       disableRange: false,
-      maxImageSize: -1,
+      maxImageSize: -1
     });
 
     this.pdfDocument = new PDFDocumentProxy(pdfInfo, this);
@@ -316,14 +316,14 @@ export class WorkerTransport {
 
   async getPage (pageNumber: number) {
     const pageIndex = pageNumber - 1;
-    
+
     if (pageIndex in this.pageCache)
       return this.pageCache[pageIndex];
-    
+
     const { pageInfo } = await this.customWorker.GetPageRequest({ pageIndex });
     const page = new PDFPageProxy(pageInfo, this);
     this.pageCache[pageIndex] = page;
-    
+
     return page;
   }
 
@@ -353,31 +353,32 @@ export class WorkerTransport {
   // @ts-expect-error
   commonobj (data) {
     var id = data[0];
-      var type = data[1];
-      if (this.commonObjs.hasData(id))
-        return;
+    var type = data[1];
+    if (this.commonObjs.hasData(id))
+      return;
 
-      switch (type) {
-        case 'Font':
-          var exportedData = data[2];
+    switch (type) {
+      case "Font":
+        var exportedData = data[2];
 
-          var font;
-          if ('error' in exportedData) {
-            var error = exportedData.error;
-            this.commonObjs.resolve(id, error);
-            break;
-          } else {
-            font = new FontFace(exportedData);
-          }
-
-          this.commonObjs.resolve(id, font);
+        var font;
+        if ("error" in exportedData) {
+          var error = exportedData.error;
+          this.commonObjs.resolve(id, error);
           break;
-        case 'FontPath':
-          this.commonObjs.resolve(id, data[2]);
-          break;
-        default:
-          throw new Error('Got unknown common object type ' + type);
-      }
+        }
+        else {
+          font = new FontFace(exportedData);
+        }
+
+        this.commonObjs.resolve(id, font);
+        break;
+      case "FontPath":
+        this.commonObjs.resolve(id, data[2]);
+        break;
+      default:
+        throw new Error("Got unknown common object type " + type);
+    }
   }
 }
 
@@ -403,7 +404,7 @@ export class PDFObjects {
       return this.objs[objId];
 
     const obj = {
-      data: null,
+      data: null
     };
 
     this.objs[objId] = obj;
@@ -450,7 +451,8 @@ export class PDFObjects {
     const objs = this.objs;
     if (!objs[objId]) {
       return null;
-    } else {
+    }
+    else {
       return objs[objId].data;
     }
   }
@@ -495,7 +497,7 @@ export class InternalRenderTask {
     var params = this.params;
     // @ts-expect-error
     this.gfx = new CanvasGraphics(params.canvasContext, this.commonObjs, this.objs, params.textLayer, params.imageLayer);
-    
+
     // @ts-expect-error
     this.gfx.beginDrawing(params.viewport, transparency);
     // @ts-expect-error
@@ -508,14 +510,14 @@ export class InternalRenderTask {
       this.graphicsReadyCallback();
     }
   }
-  
+
   cancel () {
     // @ts-expect-error
     this.running = false;
     // @ts-expect-error
     this.cancelled = true;
   }
-  
+
   operatorListChanged () {
     // @ts-expect-error
     if (!this.graphicsReady) {
@@ -526,15 +528,15 @@ export class InternalRenderTask {
       }
       return;
     }
-    
+
     // @ts-expect-error
     if (this.running) {
       return;
     }
-    
+
     this._continue();
   }
-  
+
   _continue () {
     // @ts-expect-error
     this.running = true;
@@ -546,11 +548,12 @@ export class InternalRenderTask {
     if (this.params.continueCallback) {
       // @ts-expect-error
       this.params.continueCallback(() => this._next());
-    } else {
+    }
+    else {
       this._next();
     }
   }
-  
+
   _next () {
     // @ts-expect-error
     if (this.cancelled) {

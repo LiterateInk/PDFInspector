@@ -53,16 +53,16 @@ export class PartialEvaluator {
     s: { id: OPS.closeStroke, numArgs: 0, variableArgs: false },
     f: { id: OPS.fill, numArgs: 0, variableArgs: false },
     F: { id: OPS.fill, numArgs: 0, variableArgs: false },
-    'f*': { id: OPS.eoFill, numArgs: 0, variableArgs: false },
+    "f*": { id: OPS.eoFill, numArgs: 0, variableArgs: false },
     B: { id: OPS.fillStroke, numArgs: 0, variableArgs: false },
-    'B*': { id: OPS.eoFillStroke, numArgs: 0, variableArgs: false },
+    "B*": { id: OPS.eoFillStroke, numArgs: 0, variableArgs: false },
     b: { id: OPS.closeFillStroke, numArgs: 0, variableArgs: false },
-    'b*': { id: OPS.closeEOFillStroke, numArgs: 0, variableArgs: false },
+    "b*": { id: OPS.closeEOFillStroke, numArgs: 0, variableArgs: false },
     n: { id: OPS.endPath, numArgs: 0, variableArgs: false },
 
     // Clipping
     W: { id: OPS.clip, numArgs: 0, variableArgs: false },
-    'W*': { id: OPS.eoClip, numArgs: 0, variableArgs: false },
+    "W*": { id: OPS.eoClip, numArgs: 0, variableArgs: false },
 
     // Text
     BT: { id: OPS.beginText, numArgs: 0, variableArgs: false },
@@ -77,11 +77,11 @@ export class PartialEvaluator {
     Td: { id: OPS.moveText, numArgs: 2, variableArgs: false },
     TD: { id: OPS.setLeadingMoveText, numArgs: 2, variableArgs: false },
     Tm: { id: OPS.setTextMatrix, numArgs: 6, variableArgs: false },
-    'T*': { id: OPS.nextLine, numArgs: 0, variableArgs: false },
+    "T*": { id: OPS.nextLine, numArgs: 0, variableArgs: false },
     Tj: { id: OPS.showText, numArgs: 1, variableArgs: false },
     TJ: { id: OPS.showSpacedText, numArgs: 1, variableArgs: false },
-    '\'': { id: OPS.nextLineShowText, numArgs: 1, variableArgs: false },
-    '"': { id: OPS.nextLineSetSpacingShowText, numArgs: 3,
+    "'": { id: OPS.nextLineShowText, numArgs: 1, variableArgs: false },
+    "\"": { id: OPS.nextLineSetSpacingShowText, numArgs: 3,
       variableArgs: false },
 
     // Color
@@ -107,25 +107,25 @@ export class PartialEvaluator {
     // (reserved partial commands for the lexer)
     BM: null,
     BD: null,
-    'true': null,
+    "true": null,
     fa: null,
     fal: null,
     fals: null,
-    'false': null,
+    "false": null,
     nu: null,
     nul: null,
-    'null': null
+    "null": null
   };
 
   static SHADING_PATTERN = 2;
 
   // @ts-expect-error
   buildFormXObject (resources, xobj, operatorList) {
-    const matrix = xobj.dict.get('Matrix');
-    const bbox = xobj.dict.get('BBox');
+    const matrix = xobj.dict.get("Matrix");
+    const bbox = xobj.dict.get("BBox");
 
     operatorList.addOp(OPS.paintFormXObjectBegin, [matrix, bbox]);
-    this.getOperatorList(xobj, xobj.dict.get('Resources') || resources, operatorList);
+    this.getOperatorList(xobj, xobj.dict.get("Resources") || resources, operatorList);
     operatorList.addOp(OPS.paintFormXObjectEnd, []);
   }
 
@@ -146,7 +146,7 @@ export class PartialEvaluator {
 
       this.handler.commonobj([
         loadedName,
-        'Font',
+        "Font",
         fontData
       ]);
 
@@ -172,7 +172,7 @@ export class PartialEvaluator {
       fontRef = font;
     }
     else { // Loading by name.
-      const fontRes = resources.get('Font');
+      const fontRes = resources.get("Font");
       if (fontRes) {
         fontRef = fontRes.getRaw(fontName);
       }
@@ -187,7 +187,7 @@ export class PartialEvaluator {
 
     // keep track of each font we translated so the caller can
     // load them asynchronously before calling display on a page
-    font.loadedName = 'g_font_' + fontRef.num + '_' + fontRef.gen;
+    font.loadedName = "g_font_" + fontRef.num + "_" + fontRef.gen;
 
     if (!font.translated) {
       const translated = this.translateFont(font);
@@ -200,12 +200,12 @@ export class PartialEvaluator {
 
   getOperatorList (stream: Stream, resources: Dict, operatorList: OperatorList) {
     const xref = this.xref;
-    
+
     // @ts-expect-error
     operatorList = operatorList || new OperatorList();
     resources = resources || new Dict();
 
-    const xobjs = resources.get('XObject') || new Dict();
+    const xobjs = resources.get("XObject") || new Dict();
     const parser = new Parser(new Lexer(stream, PartialEvaluator.OP_MAP), false, xref);
 
     let args = [];
@@ -220,7 +220,7 @@ export class PartialEvaluator {
         // @ts-expect-error
         var opSpec = PartialEvaluator.OP_MAP[cmd];
         if (!opSpec) {
-          console.warn('Unknown command "' + cmd + '"');
+          console.warn("Unknown command \"" + cmd + "\"");
           continue;
         }
 
@@ -245,18 +245,18 @@ export class PartialEvaluator {
             const xobj = xobjs.get(name);
 
             if (xobj) {
-              assert(isStream(xobj), 'XObject should be a stream');
+              assert(isStream(xobj), "XObject should be a stream");
 
-              const type = xobj.dict.get('Subtype');
-              assert(isName(type), 'XObject should have a Name subtype');
+              const type = xobj.dict.get("Subtype");
+              assert(isName(type), "XObject should have a Name subtype");
 
-              if ('Form' == type.name) {
+              if ("Form" == type.name) {
                 this.buildFormXObject(resources, xobj, operatorList);
                 args = [];
                 continue;
               }
               else {
-                throw new Error('unhandled xobject subtype ' + type.name);
+                throw new Error("unhandled xobject subtype " + type.name);
               }
             }
 
@@ -276,10 +276,10 @@ export class PartialEvaluator {
             this.state = old.clone();
             break;
           }
-          
+
           case OPS.restore: {
             const prev = this.stateStack.pop();
-            
+
             if (prev) {
               this.state = prev;
             }
@@ -300,7 +300,7 @@ export class PartialEvaluator {
       }
       else if (obj !== null && obj !== undefined) {
         args.push(obj instanceof Dict ? obj.getAll() : obj);
-        assert(args.length <= 33, 'Too many arguments');
+        assert(args.length <= 33, "Too many arguments");
       }
     }
 
@@ -310,8 +310,8 @@ export class PartialEvaluator {
   translateFont (dict: Dict) {
     const MAX_CHAR_INDEX = 0xFF;
 
-    const type = dict.get('Subtype') as unknown as Name;
-    assert(isName(type), 'invalid font: Subtype');
+    const type = dict.get("Subtype") as unknown as Name;
+    assert(isName(type), "invalid font: Subtype");
 
     const properties = {
       type: type.name,
@@ -319,11 +319,11 @@ export class PartialEvaluator {
       lastChar: MAX_CHAR_INDEX
     };
 
-    if (dict.get('FontDescriptor')) {
-      const firstChar = dict.get('FirstChar') as unknown as number;
+    if (dict.get("FontDescriptor")) {
+      const firstChar = dict.get("FirstChar") as unknown as number;
       if (firstChar) properties.firstChar = firstChar;
-      
-      const lastChar = dict.get('LastChar') as unknown as number;
+
+      const lastChar = dict.get("LastChar") as unknown as number;
       if (lastChar) properties.lastChar = lastChar;
     }
 
@@ -353,7 +353,7 @@ export class OperatorList {
   }
 
   /**
-   * @param fn probably from OPS 
+   * @param fn probably from OPS
    */
   addOp (fn: number, args: unknown[]) {
     this.fnArray[this.fnIndex++] = fn;
@@ -386,7 +386,7 @@ export class OperatorList {
         length: this.length
       },
       pageIndex: this.pageIndex
-    })
+    });
 
     this.dependencies = {};
     this.argsArray = [];
@@ -397,7 +397,7 @@ export class OperatorList {
 export class EvalState {
   public font: Font | null = null;
   public textRenderingMode = TextRenderingMode.FILL;
-  
+
   clone () {
     return Object.create(this);
   }

@@ -88,7 +88,7 @@ export const OPS = {
   paintFormXObjectBegin: 74,
   paintFormXObjectEnd: 75,
   beginGroup: 76,
-  endGroup: 77,
+  endGroup: 77
 };
 
 //MQZ.Mar.22 Disabled Operators (to prevent image painting & annotation default appearance)
@@ -105,15 +105,15 @@ export function assert(cond, msg) {
 // @ts-expect-error
 export function shadow(obj, prop, value) {
   Object.defineProperty(obj, prop, { value: value,
-                                     enumerable: true,
-                                     configurable: true,
-                                     writable: false });
+    enumerable: true,
+    configurable: true,
+    writable: false });
   return value;
 }
 
 // @ts-expect-error
 export function bytesToString(bytes) {
-  var str = '';
+  var str = "";
   var length = bytes.length;
   for (var n = 0; n < length; ++n)
     str += String.fromCharCode(bytes[n]);
@@ -136,7 +136,7 @@ export var IDENTITY_MATRIX = [1, 0, 0, 1, 0, 0];
 export class Util {
   // @ts-expect-error
   static makeCssRgb = function Util_makeCssRgb(rgb) {
-    return 'rgb(' + rgb[0] + ',' + rgb[1] + ',' + rgb[2] + ')';
+    return "rgb(" + rgb[0] + "," + rgb[1] + "," + rgb[2] + ")";
   };
 
   // For 2d affine transforms
@@ -238,7 +238,8 @@ export class PageViewport {
       offsetCanvasY = Math.abs(centerX - viewBox[0]) * scale + offsetY;
       width = Math.abs(viewBox[3] - viewBox[1]) * scale;
       height = Math.abs(viewBox[2] - viewBox[0]) * scale;
-    } else {
+    }
+    else {
       offsetCanvasX = Math.abs(centerX - viewBox[0]) * scale + offsetX;
       offsetCanvasY = Math.abs(centerY - viewBox[1]) * scale + offsetY;
       width = Math.abs(viewBox[2] - viewBox[0]) * scale;
@@ -267,9 +268,9 @@ export class PageViewport {
   clone (args) {
     args = args || {};
     // @ts-expect-error
-    var scale = 'scale' in args ? args.scale : this.scale;
+    var scale = "scale" in args ? args.scale : this.scale;
     // @ts-expect-error
-    var rotation = 'rotation' in args ? args.rotation : this.rotation;
+    var rotation = "rotation" in args ? args.rotation : this.rotation;
     // @ts-expect-error
     return new PageViewport(this.viewBox.slice(), scale, rotation, this.offsetX, this.offsetY, args.dontFlip);
   }
@@ -309,13 +310,14 @@ export const PDFStringTranslateTable = [
 
 // @ts-expect-error
 export function stringToPDFString(str) {
-  var i, n = str.length, str2 = '';
-  if (str[0] === '\xFE' && str[1] === '\xFF') {
+  var i, n = str.length, str2 = "";
+  if (str[0] === "\xFE" && str[1] === "\xFF") {
     // UTF16BE BOM
     for (i = 2; i < n; i += 2)
       str2 += String.fromCharCode(
         (str.charCodeAt(i) << 8) | str.charCodeAt(i + 1));
-  } else {
+  }
+  else {
     for (i = 0; i < n; ++i) {
       var code = PDFStringTranslateTable[str.charCodeAt(i)];
       str2 += code ? String.fromCharCode(code) : str.charAt(i);
@@ -338,19 +340,19 @@ export function isEmptyObj(obj) {
 }
 
 export function isBool(v: any): v is boolean {
-  return typeof v == 'boolean';
+  return typeof v == "boolean";
 }
 
 export function isInt(v: any): v is number {
-  return typeof v == 'number' && ((v | 0) == v);
+  return typeof v == "number" && ((v | 0) == v);
 }
 
 export function isNum(v: any): v is number {
-  return typeof v == 'number';
+  return typeof v == "number";
 }
 
 export function isString (v: any): v is string {
-  return typeof v == 'string';
+  return typeof v == "string";
 }
 
 export function isNull (v: any): v is null {
@@ -372,7 +374,7 @@ export function isDict (v: any, type?: string): v is Dict {
   if (!type) {
     return true;
   }
-  var dictType = v.get('Type');
+  var dictType = v.get("Type");
   return isName(dictType) && dictType.name == type;
 }
 
@@ -381,13 +383,13 @@ export function isArray (v: any): v is Array<any> {
 }
 
 export function isStream (v: any): v is Stream {
-  return typeof v == 'object' && v !== null && v !== undefined &&
-    ('getBytes' in v);
+  return typeof v == "object" && v !== null && v !== undefined &&
+    ("getBytes" in v);
 }
 
 export function isArrayBuffer (v: any): v is ArrayBuffer {
-  return typeof v == 'object' && v !== null && v !== undefined &&
-    ('byteLength' in v);
+  return typeof v == "object" && v !== null && v !== undefined &&
+    ("byteLength" in v);
 }
 
 export function isRef (v: any): v is Ref {
@@ -397,7 +399,7 @@ export function isRef (v: any): v is Ref {
 export function isPDFFunction (v: any): v is Dict | Stream {
   let fnDict;
 
-  if (typeof v != 'object')
+  if (typeof v != "object")
     return false;
   else if (isDict(v))
     fnDict = v;
@@ -405,6 +407,6 @@ export function isPDFFunction (v: any): v is Dict | Stream {
     fnDict = v.dict;
   else
     return false;
-  
-    return fnDict!.has('FunctionType');
+
+  return fnDict!.has("FunctionType");
 }

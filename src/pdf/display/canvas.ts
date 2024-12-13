@@ -25,13 +25,13 @@ export function addContextCurrentTransform(ctx) {
     ctx._transformMatrix = [ctx._scaleX, 0, 0, ctx._scaleY, 0, 0];
     ctx._transformStack = [];
 
-    Object.defineProperty(ctx, 'mozCurrentTransform', {
+    Object.defineProperty(ctx, "mozCurrentTransform", {
       get: function getCurrentTransform() {
         return this._transformMatrix;
       }
     });
 
-    Object.defineProperty(ctx, 'mozCurrentTransformInverse', {
+    Object.defineProperty(ctx, "mozCurrentTransformInverse", {
       get: function getCurrentTransformInverse() {
         // Calculation done using WolframAlpha:
         // http://www.wolframalpha.com/input/?
@@ -145,10 +145,11 @@ export var CachedCanvases = (function CachedCanvasesClosure() {
         canvasEntry.canvas.height = height;
         // reset canvas transform for emulated mozCurrentTransform, if needed
         canvasEntry.context.setTransform(1, 0, 0, 1, 0, 0);
-      } else {
+      }
+      else {
         // @ts-expect-error
         var canvas = createScratchCanvas(width, height);
-        var ctx = canvas.getContext('2d');
+        var ctx = canvas.getContext("2d");
         if (trackTransform) {
           addContextCurrentTransform(ctx);
         }
@@ -215,9 +216,9 @@ export var CanvasExtraState = (function CanvasExtraStateClosure() {
     this.strokeColorObj = null;
     // Default fore and background colors
     // @ts-expect-error
-    this.fillColor = '#000000';
+    this.fillColor = "#000000";
     // @ts-expect-error
-    this.strokeColor = '#000000';
+    this.strokeColor = "#000000";
     // Note: fill alpha applies to all non-stroking operations
     // @ts-expect-error
     this.fillAlpha = 1;
@@ -251,12 +252,12 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
   var EXECUTION_TIME = 15;
 
   /**
-   * 
-   * @param {*} canvasCtx 
-   * @param {PDFObjects} commonObjs 
-   * @param {PDFObjects} objs 
-   * @param {*} textLayer 
-   * @param {*} imageLayer 
+   *
+   * @param {*} canvasCtx
+   * @param {PDFObjects} commonObjs
+   * @param {PDFObjects} objs
+   * @param {*} textLayer
+   * @param {*} imageLayer
    */
   // @ts-expect-error
   function CanvasGraphics(canvasCtx, commonObjs, objs, textLayer, imageLayer) {
@@ -306,8 +307,8 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
     }
   }
 
-  var LINE_CAP_STYLES = ['butt', 'round', 'square'];
-  var LINE_JOIN_STYLES = ['miter', 'round', 'bevel'];
+  var LINE_CAP_STYLES = ["butt", "round", "square"];
+  var LINE_JOIN_STYLES = ["miter", "round", "bevel"];
   var NORMAL_CLIP = {};
   var EO_CLIP = {};
 
@@ -323,10 +324,11 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
       var height = this.ctx.canvas.height;
       if (transparency) {
         this.ctx.clearRect(0, 0, width, height);
-      } else {
+      }
+      else {
         this.ctx.mozOpaque = true;
         this.ctx.save();
-        this.ctx.fillStyle = 'rgb(255, 255, 255)';
+        this.ctx.fillStyle = "rgb(255, 255, 255)";
         this.ctx.fillRect(0, 0, width, height);
         this.ctx.restore();
       }
@@ -363,7 +365,7 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
       var objs = this.objs;
       var fnId;
 
-//MQZ.Mar.22 Disabled Operators
+      //MQZ.Mar.22 Disabled Operators
       var noOpIdx = -1;
 
       while (true) {
@@ -372,21 +374,21 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
         if (fnId !== OPS.dependency) {
           noOpIdx = NO_OPS_RANGE.indexOf(fnId);
           if (this.opMode) {
-             if (noOpIdx >= 0) {
-               this.opMode = false;
-               this.noOpStartIdx = noOpIdx;
-               console.info("NO_OP Begin: " + this[fnId].name + " - " + i);
-             }
-             else if (NO_OPS.indexOf(fnId) < 0) {
-               this[fnId].apply(this, argsArray[i]);
-             }
+            if (noOpIdx >= 0) {
+              this.opMode = false;
+              this.noOpStartIdx = noOpIdx;
+              console.info("NO_OP Begin: " + this[fnId].name + " - " + i);
+            }
+            else if (NO_OPS.indexOf(fnId) < 0) {
+              this[fnId].apply(this, argsArray[i]);
+            }
           }
           else {
-             if (noOpIdx >= 0 && noOpIdx === (this.noOpStartIdx+1)) {
-               this.opMode = true;
-               this.noOpStartIdx = -1;
-               console.info("NO_OP End: " + this[fnId].name + " - " + i);
-             }
+            if (noOpIdx >= 0 && noOpIdx === (this.noOpStartIdx+1)) {
+              this.opMode = true;
+              this.noOpStartIdx = -1;
+              console.info("NO_OP End: " + this[fnId].name + " - " + i);
+            }
           }
         }
 
@@ -432,10 +434,11 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
     // @ts-expect-error
     setDash: function CanvasGraphics_setDash(dashArray, dashPhase) {
       var ctx = this.ctx;
-      if ('setLineDash' in ctx) {
+      if ("setLineDash" in ctx) {
         ctx.setLineDash(dashArray);
         ctx.lineDashOffset = dashPhase;
-      } else {
+      }
+      else {
         ctx.mozDash = dashArray;
         ctx.mozDashOffset = dashPhase;
       }
@@ -459,52 +462,53 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
         var value = state[1];
 
         switch (key) {
-          case 'LW':
+          case "LW":
             this.setLineWidth(value);
             break;
-          case 'LC':
+          case "LC":
             this.setLineCap(value);
             break;
-          case 'LJ':
+          case "LJ":
             this.setLineJoin(value);
             break;
-          case 'ML':
+          case "ML":
             this.setMiterLimit(value);
             break;
-          case 'D':
+          case "D":
             this.setDash(value[0], value[1]);
             break;
-          case 'RI':
+          case "RI":
             this.setRenderingIntent(value);
             break;
-          case 'FL':
+          case "FL":
             this.setFlatness(value);
             break;
-          case 'Font':
+          case "Font":
             this.setFont(value[0], value[1]);
             break;
-          case 'CA':
+          case "CA":
             this.current.strokeAlpha = state[1];
             break;
-          case 'ca':
+          case "ca":
             this.current.fillAlpha = state[1];
             this.ctx.globalAlpha = state[1];
             break;
-          case 'BM':
-            if (value && value.name && (value.name !== 'Normal')) {
+          case "BM":
+            if (value && value.name && (value.name !== "Normal")) {
               var mode = value.name.replace(/([A-Z])/g,
                 // @ts-expect-error
                 function(c) {
-                  return '-' + c.toLowerCase();
+                  return "-" + c.toLowerCase();
                 }
               ).substring(1);
               this.ctx.globalCompositeOperation = mode;
               if (this.ctx.globalCompositeOperation !== mode) {
-                console.warn('globalCompositeOperation "' + mode +
-                     '" is not supported');
+                console.warn("globalCompositeOperation \"" + mode +
+                     "\" is not supported");
               }
-            } else {
-              this.ctx.globalCompositeOperation = 'source-over';
+            }
+            else {
+              this.ctx.globalCompositeOperation = "source-over";
             }
             break;
         }
@@ -564,7 +568,7 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
     },
     // @ts-expect-error
     stroke: function CanvasGraphics_stroke(consumePath) {
-      consumePath = typeof consumePath !== 'undefined' ? consumePath : true;
+      consumePath = typeof consumePath !== "undefined" ? consumePath : true;
       var ctx = this.ctx;
       var strokeColor = this.current.strokeColor;
       if (this.current.lineWidth === 0)
@@ -572,15 +576,16 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
       // For stroke we want to temporarily change the global alpha to the
       // stroking alpha.
       ctx.globalAlpha = this.current.strokeAlpha;
-      if (strokeColor && strokeColor.hasOwnProperty('type') &&
-          strokeColor.type === 'Pattern') {
+      if (strokeColor && strokeColor.hasOwnProperty("type") &&
+          strokeColor.type === "Pattern") {
         // for patterns, we transform to pattern space, calculate
         // the pattern, call stroke, and restore to user space
         ctx.save();
         ctx.strokeStyle = strokeColor.getPattern(ctx, this);
         ctx.stroke();
         ctx.restore();
-      } else {
+      }
+      else {
         ctx.stroke();
       }
       if (consumePath)
@@ -594,33 +599,36 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
     },
     // @ts-expect-error
     fill: function CanvasGraphics_fill(consumePath) {
-      consumePath = typeof consumePath !== 'undefined' ? consumePath : true;
+      consumePath = typeof consumePath !== "undefined" ? consumePath : true;
       var ctx = this.ctx;
       var fillColor = this.current.fillColor;
       var needRestore = false;
 
-      if (fillColor && fillColor.hasOwnProperty('type') &&
-          fillColor.type === 'Pattern') {
+      if (fillColor && fillColor.hasOwnProperty("type") &&
+          fillColor.type === "Pattern") {
         ctx.save();
         ctx.fillStyle = fillColor.getPattern(ctx, this);
         needRestore = true;
       }
 
       if (this.pendingEOFill) {
-        if ('mozFillRule' in this.ctx) {
-          this.ctx.mozFillRule = 'evenodd';
+        if ("mozFillRule" in this.ctx) {
+          this.ctx.mozFillRule = "evenodd";
           this.ctx.fill();
-          this.ctx.mozFillRule = 'nonzero';
-        } else {
+          this.ctx.mozFillRule = "nonzero";
+        }
+        else {
           try {
-            this.ctx.fill('evenodd');
-          } catch (ex) {
+            this.ctx.fill("evenodd");
+          }
+          catch (ex) {
             // shouldn't really happen, but browsers might think differently
             this.ctx.fill();
           }
         }
         this.pendingEOFill = false;
-      } else {
+      }
+      else {
         this.ctx.fill();
       }
 
@@ -673,7 +681,7 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
       this.current.y = this.current.lineY = 0;
     },
     endText: function CanvasGraphics_endText() {
-      if (!('pendingTextPaths' in this)) {
+      if (!("pendingTextPaths" in this)) {
         this.ctx.beginPath();
         return;
       }
@@ -715,16 +723,16 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
       var current = this.current;
 
       if (!fontObj)
-        throw new Error('Can\'t find font for ' + fontRefName);
+        throw new Error("Can't find font for " + fontRefName);
 
       current.fontMatrix = fontObj.fontMatrix ? fontObj.fontMatrix :
-                                                FONT_IDENTITY_MATRIX;
+        FONT_IDENTITY_MATRIX;
 
       // A valid matrix needs all main diagonal elements to be non-zero
       // This also ensures we bypass FF bugzilla bug #719844.
       if (current.fontMatrix[0] === 0 ||
           current.fontMatrix[3] === 0) {
-        console.warn('Invalid font matrix for font ' + fontRefName);
+        console.warn("Invalid font matrix for font " + fontRefName);
       }
 
       // The spec for Tf (setFont) says that 'size' specifies the font 'scale',
@@ -732,7 +740,8 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
       if (size < 0) {
         size = -size;
         current.fontDirection = -1;
-      } else {
+      }
+      else {
         current.fontDirection = 1;
       }
 
@@ -742,12 +751,12 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
       if (fontObj.coded)
         return; // we don't need ctx.font for Type3 fonts
 
-      var name = fontObj.loadedName || 'sans-serif';
-      var bold = fontObj.black ? (fontObj.bold ? 'bolder' : 'bold') :
-                                 (fontObj.bold ? 'bold' : 'normal');
+      var name = fontObj.loadedName || "sans-serif";
+      var bold = fontObj.black ? (fontObj.bold ? "bolder" : "bold") :
+        (fontObj.bold ? "bold" : "normal");
 
-      var italic = fontObj.italic ? 'italic' : 'normal';
-      var typeface = '"' + name + '", ' + fontObj.fallbackName;
+      var italic = fontObj.italic ? "italic" : "normal";
+      var typeface = "\"" + name + "\", " + fontObj.fallbackName;
 
       // Some font backends cannot handle fonts below certain size.
       // Keeping the font at minimal size and using the fontSizeScale to change
@@ -755,9 +764,9 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
       // See https://bugzilla.mozilla.org/show_bug.cgi?id=726227
       var browserFontSize = size >= MIN_FONT_SIZE ? size : MIN_FONT_SIZE;
       this.current.fontSizeScale = browserFontSize != MIN_FONT_SIZE ? 1.0 :
-                                   size / MIN_FONT_SIZE;
+        size / MIN_FONT_SIZE;
 
-      var rule = italic + ' ' + bold + ' ' + browserFontSize + 'px ' + typeface;
+      var rule = italic + " " + bold + " " + browserFontSize + "px " + typeface;
       this.ctx.font = rule;
 
       this.ctx.setFont(fontObj);
@@ -797,7 +806,8 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
       ctx.translate(current.x, current.y + current.textRise);
       if (current.fontDirection > 0) {
         ctx.scale(current.textHScale, -1);
-      } else {
+      }
+      else {
         ctx.scale(-current.textHScale, 1);
       }
     },
@@ -809,9 +819,9 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
       var a = ctxMatrix[0], b = ctxMatrix[1], c = ctxMatrix[2];
       var d = ctxMatrix[3], e = ctxMatrix[4], f = ctxMatrix[5];
       var sx = (a >= 0) ?
-          Math.sqrt((a * a) + (b * b)) : -Math.sqrt((a * a) + (b * b));
+        Math.sqrt((a * a) + (b * b)) : -Math.sqrt((a * a) + (b * b));
       var sy = (d >= 0) ?
-          Math.sqrt((c * c) + (d * d)) : -Math.sqrt((c * c) + (d * d));
+        Math.sqrt((c * c) + (d * d)) : -Math.sqrt((c * c) + (d * d));
       var angle = Math.atan2(b, a);
       var x = e;
       var y = f;
@@ -940,22 +950,23 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
         }
         ctx.restore();
         this.processingType3 = null;
-      } else {
+      }
+      else {
         ctx.save();
 
-//MQZ Dec.04.2013 handles leading word spacing
-          var tx = 0;
-          if (wordSpacing !== 0) {
-            // @ts-expect-error
-            var firstGlyph = glyphs.filter(g => g && ('fontChar' in g || 'unicode' in g))[0];
-            if (firstGlyph && (firstGlyph.fontChar === ' ' || firstGlyph.unicode === ' ')) {
-              tx = wordSpacing * fontSize * textHScale;
-            }
+        //MQZ Dec.04.2013 handles leading word spacing
+        var tx = 0;
+        if (wordSpacing !== 0) {
+          // @ts-expect-error
+          var firstGlyph = glyphs.filter((g) => g && ("fontChar" in g || "unicode" in g))[0];
+          if (firstGlyph && (firstGlyph.fontChar === " " || firstGlyph.unicode === " ")) {
+            tx = wordSpacing * fontSize * textHScale;
           }
+        }
 
-        current.x += tx
+        current.x += tx;
         this.applyTextTransforms();
-        current.x -= tx
+        current.x -= tx;
         // MQZ-GYJ Apr.20.2017 handles leading word spacing over
 
         var lineWidth = current.lineWidth;
@@ -976,8 +987,8 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
 
         ctx.lineWidth = lineWidth;
 
-//MQZ. Feb.20.2013. Disable character based painting, make it a string
-          var str = "";
+        //MQZ. Feb.20.2013. Disable character based painting, make it a string
+        var str = "";
 
         var x = 0;
         for (var i = 0; i < glyphsLength; ++i) {
@@ -1008,7 +1019,8 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
               scaledX = vx / fontSizeScale;
               // @ts-expect-error
               scaledY = (x + vy) / fontSizeScale;
-            } else {
+            }
+            else {
               scaledX = x / fontSizeScale;
               scaledY = 0;
             }
@@ -1031,14 +1043,14 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
             }
 
             //MQZ. Feb.20.2013. Disable character based painting, make it a string
-//            this.paintChar(character, scaledX, scaledY);
-              str += glyph.unicode || character;
+            //            this.paintChar(character, scaledX, scaledY);
+            str += glyph.unicode || character;
             if (accent) {
               scaledAccentX = scaledX + accent.offset.x / fontSizeScale;
               scaledAccentY = scaledY - accent.offset.y / fontSizeScale;
-                //MQZ. Feb.20.2013. Disable character based painting, make it a string
-//              this.paintChar(accent.fontChar, scaledAccentX, scaledAccentY);
-//                str += accent.fontChar;
+              //MQZ. Feb.20.2013. Disable character based painting, make it a string
+              //              this.paintChar(accent.fontChar, scaledAccentX, scaledAccentY);
+              //                str += accent.fontChar;
             }
           }
 
@@ -1052,26 +1064,27 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
         }
         if (vertical) {
           current.y -= x * textHScale;
-        } else {
+        }
+        else {
           current.x += x * textHScale;
         }
-        
+
         if (str) {
-            var curFontSize = fontSize * scale * textHScale + 3;
-            switch (current.textRenderingMode) {
-              case TextRenderingMode.FILL:
-                  ctx.fillText(str, 0, 0, canvasWidth, curFontSize);
-                  break;
-              case TextRenderingMode.STROKE:
-                  ctx.strokeText(str, 0, 0, canvasWidth, curFontSize);
-                  break;
-              case TextRenderingMode.FILL_STROKE:
-                  ctx.fillText(str, 0, 0, canvasWidth, curFontSize);
-                  break;
-              case TextRenderingMode.INVISIBLE:
-              case TextRenderingMode.ADD_TO_PATH:
-                  break;
-              default: // other unsupported rendering modes
+          var curFontSize = fontSize * scale * textHScale + 3;
+          switch (current.textRenderingMode) {
+            case TextRenderingMode.FILL:
+              ctx.fillText(str, 0, 0, canvasWidth, curFontSize);
+              break;
+            case TextRenderingMode.STROKE:
+              ctx.strokeText(str, 0, 0, canvasWidth, curFontSize);
+              break;
+            case TextRenderingMode.FILL_STROKE:
+              ctx.fillText(str, 0, 0, canvasWidth, curFontSize);
+              break;
+            case TextRenderingMode.INVISIBLE:
+            case TextRenderingMode.ADD_TO_PATH:
+              break;
+            default: // other unsupported rendering modes
           }
         }
 
@@ -1112,62 +1125,65 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
         ctx.restore();
       }
 
-//MQZ Nov.28.2012 Adjust Text Positions, and also make it a string
+      //MQZ Nov.28.2012 Adjust Text Positions, and also make it a string
       // @ts-expect-error
       var stGlyphs = [];
       var spaceWidth = font.spaceWidth;
       if (!font.spaceWidth) {
-          var spaceId = isArray(font.toFontChar) ? font.toFontChar.indexOf(32) : -1;
-          spaceWidth = (spaceId >= 0 && isArray(font.widths)) ? font.widths[spaceId] : 250;
+        var spaceId = isArray(font.toFontChar) ? font.toFontChar.indexOf(32) : -1;
+        spaceWidth = (spaceId >= 0 && isArray(font.widths)) ? font.widths[spaceId] : 250;
       }
 
       for (var i = 0; i < arrLength; ++i) {
         var e = arr[i];
         if (isNum(e)) {
           var spacingLength = -e * fontSize * textHScale;
-//MQZ. Dec.04.2013 Disable character based rendering - remove kerning
+          //MQZ. Dec.04.2013 Disable character based rendering - remove kerning
           if (stGlyphs.length === 0) {
-              if (vertical) {
-                current.y += spacingLength;
-              } else {
-                current.x += spacingLength;
-              }
+            if (vertical) {
+              current.y += spacingLength;
+            }
+            else {
+              current.x += spacingLength;
+            }
           }
           else {
             //MQZ-GYJ. Apr.20.2017 split word when spacing is a positive number but very big
-              if (Math.abs(e) >= spaceWidth) {
-                  if (vertical) {
-                      current.y += spacingLength;
-                  } else {
-                      this.showText(stGlyphs, true);
-                      stGlyphs = [];
-                      current.x += spacingLength;
-                  }
+            if (Math.abs(e) >= spaceWidth) {
+              if (vertical) {
+                current.y += spacingLength;
               }
+              else {
+                this.showText(stGlyphs, true);
+                stGlyphs = [];
+                current.x += spacingLength;
+              }
+            }
           }
 
           if (textSelection)
             spacingAccumulator += spacingLength;
-        } else {
-//MQZ. Dec.04.2013 Disable character based rendering - make it a string
-//          var shownCanvasWidth = this.showText(e, true);
-//
-//          if (textSelection) {
-//            canvasWidth += spacingAccumulator + shownCanvasWidth;
-//            spacingAccumulator = 0;
-//          }
+        }
+        else {
+          //MQZ. Dec.04.2013 Disable character based rendering - make it a string
+          //          var shownCanvasWidth = this.showText(e, true);
+          //
+          //          if (textSelection) {
+          //            canvasWidth += spacingAccumulator + shownCanvasWidth;
+          //            spacingAccumulator = 0;
+          //          }
 
-            // @ts-expect-error
-            stGlyphs = stGlyphs.concat(e);
+          // @ts-expect-error
+          stGlyphs = stGlyphs.concat(e);
         }
       }
 
-//MQZ. Nov.28.2012 Disable character based rendering, make it a string
-        if (stGlyphs.length) {
-            var shownCanvasWidth = this.showText(stGlyphs, true);
-            if (textSelection)
-              canvasWidth += shownCanvasWidth;
-        }
+      //MQZ. Nov.28.2012 Disable character based rendering, make it a string
+      if (stGlyphs.length) {
+        var shownCanvasWidth = this.showText(stGlyphs, true);
+        if (textSelection)
+          canvasWidth += shownCanvasWidth;
+      }
 
       if (textSelection) {
         geom.canvasWidth = canvasWidth;
@@ -1289,19 +1305,22 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
     consumePath: function CanvasGraphics_consumePath() {
       if (this.pendingClip) {
         if (this.pendingClip == EO_CLIP) {
-          if ('mozFillRule' in this.ctx) {
-            this.ctx.mozFillRule = 'evenodd';
+          if ("mozFillRule" in this.ctx) {
+            this.ctx.mozFillRule = "evenodd";
             this.ctx.clip();
-            this.ctx.mozFillRule = 'nonzero';
-          } else {
+            this.ctx.mozFillRule = "nonzero";
+          }
+          else {
             try {
-              this.ctx.clip('evenodd');
-            } catch (ex) {
+              this.ctx.clip("evenodd");
+            }
+            catch (ex) {
               // shouldn't really happen, but browsers might think differently
               this.ctx.clip();
             }
           }
-        } else {
+        }
+        else {
           this.ctx.clip();
         }
         this.pendingClip = null;
@@ -1318,14 +1337,14 @@ export var CanvasGraphics = (function CanvasGraphicsClosure() {
         (inverse[0] * inverse[0] + inverse[1] * inverse[1]),
         (inverse[2] * inverse[2] + inverse[3] * inverse[3])));
     },
-      
+
     // @ts-expect-error
     getCanvasPosition: function CanvasGraphics_getCanvasPosition(x, y) {
-        var transform = this.ctx.mozCurrentTransform;
-        return [
-          transform[0] * x + transform[2] * y + transform[4],
-          transform[1] * x + transform[3] * y + transform[5]
-        ];
+      var transform = this.ctx.mozCurrentTransform;
+      return [
+        transform[0] * x + transform[2] * y + transform[4],
+        transform[1] * x + transform[3] * y + transform[5]
+      ];
     }
   };
 

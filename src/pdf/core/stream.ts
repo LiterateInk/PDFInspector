@@ -66,7 +66,7 @@ export class Stream {
   reset (): void {
     this.pos = this.start;
   }
-  
+
   moveStart (): void {
     this.start = this.pos;
   }
@@ -97,7 +97,7 @@ abstract class DecodeStream {
     const buffer = new Uint8Array(size);
     for (let i = 0; i < current; ++i)
       buffer[i] = this.buffer![i];
-    
+
     return (this.buffer = buffer);
   }
 
@@ -125,7 +125,8 @@ abstract class DecodeStream {
       var bufEnd = this.bufferLength;
       if (end > bufEnd)
         end = bufEnd;
-    } else {
+    }
+    else {
       while (!this.eof)
         this.readBlock();
 
@@ -149,7 +150,7 @@ abstract class DecodeStream {
 
   makeSubStream (start: number, length: number, dict?: Dict) {
     const end = start + length;
-    
+
     while (this.bufferLength <= end && !this.eof)
       this.readBlock();
 
@@ -274,7 +275,7 @@ export class FlateStream extends DecodeStream {
 
   // @ts-expect-error
   constructor (stream) {
-    super()
+    super();
     var bytes = stream.getBytes();
     var bytesPos = 0;
 
@@ -282,19 +283,19 @@ export class FlateStream extends DecodeStream {
     var cmf = bytes[bytesPos++];
     var flg = bytes[bytesPos++];
     if (cmf == -1 || flg == -1)
-      throw new Error('Invalid header in flate stream: ' + cmf + ', ' + flg);
+      throw new Error("Invalid header in flate stream: " + cmf + ", " + flg);
     if ((cmf & 0x0f) != 0x08)
-      throw new Error('Unknown compression method in flate stream: ' + cmf + ', ' + flg);
+      throw new Error("Unknown compression method in flate stream: " + cmf + ", " + flg);
     if ((((cmf << 8) + flg) % 31) !== 0)
-      throw new Error('Bad FCHECK in flate stream: ' + cmf + ', ' + flg);
+      throw new Error("Bad FCHECK in flate stream: " + cmf + ", " + flg);
     if (flg & 0x20)
-      throw new Error('FDICT bit set in flate stream: ' + cmf + ', ' + flg);
+      throw new Error("FDICT bit set in flate stream: " + cmf + ", " + flg);
 
     // @ts-expect-error
     this.bytes = bytes;
     // @ts-expect-error
     this.bytesPos = bytesPos;
-    
+
     // @ts-expect-error
     this.codeSize = 0;
     // @ts-expect-error
@@ -314,8 +315,8 @@ export class FlateStream extends DecodeStream {
 
     var b;
     while (codeSize < bits) {
-      if (typeof (b = bytes[bytesPos++]) == 'undefined')
-        throw new Error('Bad encoding in flate stream');
+      if (typeof (b = bytes[bytesPos++]) == "undefined")
+        throw new Error("Bad encoding in flate stream");
       codeBuf |= b << codeSize;
       codeSize += 8;
     }
@@ -344,8 +345,8 @@ export class FlateStream extends DecodeStream {
 
     while (codeSize < maxLen) {
       var b;
-      if (typeof (b = bytes[bytesPos++]) == 'undefined')
-        throw new Error('Bad encoding in flate stream');
+      if (typeof (b = bytes[bytesPos++]) == "undefined")
+        throw new Error("Bad encoding in flate stream");
       codeBuf |= (b << codeSize);
       codeSize += 8;
     }
@@ -353,7 +354,7 @@ export class FlateStream extends DecodeStream {
     var codeLen = code >> 16;
     var codeVal = code & 0xffff;
     if (codeSize === 0 || codeSize < codeLen || codeLen === 0)
-      throw new Error('Bad encoding in flate stream');
+      throw new Error("Bad encoding in flate stream");
     // @ts-expect-error
     this.codeBuf = (codeBuf >> codeLen);
     // @ts-expect-error
@@ -378,8 +379,8 @@ export class FlateStream extends DecodeStream {
     var size = 1 << maxLen;
     var codes = new Uint32Array(size);
     for (var len = 1, code = 0, skip = 2;
-         len <= maxLen;
-         ++len, code <<= 1, skip <<= 1) {
+      len <= maxLen;
+      ++len, code <<= 1, skip <<= 1) {
       for (var val = 0; val < n; ++val) {
         if (lengths[val] == len) {
           // bit-reverse the code
@@ -405,10 +406,10 @@ export class FlateStream extends DecodeStream {
   readBlock () {
     // read block header
     let hdr = this.getBits(3);
-    
+
     if (hdr & 1)
       this.eof = true;
-    
+
     hdr >>= 1;
 
     if (hdr === 0) { // uncompressed block
@@ -418,25 +419,25 @@ export class FlateStream extends DecodeStream {
       let bytesPos = this.bytesPos;
       let b;
 
-      if (typeof (b = bytes[bytesPos++]) == 'undefined')
-        throw new Error('Bad block header in flate stream');
+      if (typeof (b = bytes[bytesPos++]) == "undefined")
+        throw new Error("Bad block header in flate stream");
       let blockLen = b;
 
-      if (typeof (b = bytes[bytesPos++]) == 'undefined')
-        throw new Error('Bad block header in flate stream');
+      if (typeof (b = bytes[bytesPos++]) == "undefined")
+        throw new Error("Bad block header in flate stream");
       blockLen |= (b << 8);
 
-      if (typeof (b = bytes[bytesPos++]) == 'undefined')
-        throw new Error('Bad block header in flate stream');
+      if (typeof (b = bytes[bytesPos++]) == "undefined")
+        throw new Error("Bad block header in flate stream");
       let check = b;
 
-      if (typeof (b = bytes[bytesPos++]) == 'undefined')
-        throw new Error('Bad block header in flate stream');
+      if (typeof (b = bytes[bytesPos++]) == "undefined")
+        throw new Error("Bad block header in flate stream");
       check |= (b << 8);
 
       if (check != (~blockLen & 0xffff) && (blockLen !== 0 || check !== 0)) {
         // Ignoring error for bad "empty" block (see issue 1277)
-        throw new Error('Bad uncompressed block length in flate stream');
+        throw new Error("Bad uncompressed block length in flate stream");
       }
 
       // @ts-expect-error
@@ -449,7 +450,7 @@ export class FlateStream extends DecodeStream {
       var end = bufferLength + blockLen;
       this.bufferLength = end;
       for (var n = bufferLength; n < end; ++n) {
-        if (typeof (b = bytes[bytesPos++]) == 'undefined') {
+        if (typeof (b = bytes[bytesPos++]) == "undefined") {
           this.eof = true;
           break;
         }
@@ -466,7 +467,8 @@ export class FlateStream extends DecodeStream {
     if (hdr == 1) { // compressed block, fixed codes
       litCodeTable = FlateStream.fixedLitCodeTab;
       distCodeTable = FlateStream.fixedDistCodeTab;
-    } else if (hdr == 2) { // compressed block, dynamic codes
+    }
+    else if (hdr == 2) { // compressed block, dynamic codes
       let numLitCodes = this.getBits(5) + 257;
       let numDistCodes = this.getBits(5) + 1;
       let numCodeLenCodes = this.getBits(4) + 4;
@@ -510,14 +512,15 @@ export class FlateStream extends DecodeStream {
         this.generateHuffmanTable(codeLengths.subarray(0, numLitCodes));
       distCodeTable =
         this.generateHuffmanTable(codeLengths.subarray(numLitCodes, codes));
-    } else {
-      throw new Error('Unknown block type in flate stream');
+    }
+    else {
+      throw new Error("Unknown block type in flate stream");
     }
 
     let buffer = this.buffer;
     let limit = buffer ? buffer.length : 0;
     let pos = this.bufferLength;
-    
+
     while (true) {
       let code1 = this.getCode(litCodeTable);
       if (code1 < 256) {
@@ -538,21 +541,21 @@ export class FlateStream extends DecodeStream {
 
       code1 -= 257;
       code1 = FlateStream.lengthDecode[code1];
-      
+
       let code2 = code1 >> 16;
       if (code2 > 0)
         code2 = this.getBits(code2);
-      
+
       const len = (code1 & 0xffff) + code2;
       code1 = this.getCode(distCodeTable);
       code1 = FlateStream.distDecode[code1];
       code2 = code1 >> 16;
-      
+
       if (code2 > 0)
         code2 = this.getBits(code2);
-      
+
       const dist = (code1 & 0xffff) + code2;
-      
+
       if (pos + len >= limit) {
         buffer = this.ensureBuffer(pos + len);
         limit = buffer.length;

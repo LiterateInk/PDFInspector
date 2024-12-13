@@ -7,38 +7,38 @@ export class CustomWorker {
 
   async loadDocument (recoveryMode?: boolean) {
     if (!this.pdfManager) {
-      throw new Error('pdfManager not initialized');
+      throw new Error("pdfManager not initialized");
     }
 
-    await this.pdfManager.ensureModel('checkHeader', [])
-    await this.pdfManager.ensureModel('parseStartXRef', [])
-    await this.pdfManager.ensureModel('parse', [recoveryMode]);
+    await this.pdfManager.ensureModel("checkHeader", []);
+    await this.pdfManager.ensureModel("parseStartXRef", []);
+    await this.pdfManager.ensureModel("parse", [recoveryMode]);
 
     // @ts-expect-error
-    const numPagesPromise = this.pdfManager.ensureModel('numPages');
+    const numPagesPromise = this.pdfManager.ensureModel("numPages");
     // @ts-expect-error
-    const fingerprintPromise = this.pdfManager.ensureModel('fingerprint');
+    const fingerprintPromise = this.pdfManager.ensureModel("fingerprint");
     // @ts-expect-error
-    const outlinePromise = this.pdfManager.ensureCatalog('documentOutline');
+    const outlinePromise = this.pdfManager.ensureCatalog("documentOutline");
     // @ts-expect-error
-    const infoPromise = this.pdfManager.ensureModel('documentInfo');
+    const infoPromise = this.pdfManager.ensureModel("documentInfo");
     // @ts-expect-error
-    const metadataPromise = this.pdfManager.ensureCatalog('metadata');
+    const metadataPromise = this.pdfManager.ensureCatalog("metadata");
 
     const results = await Promise.all([
       numPagesPromise,
       fingerprintPromise,
       outlinePromise,
       infoPromise,
-      metadataPromise,
-    ])
-    
+      metadataPromise
+    ]);
+
     return {
       numPages: results[0],
       fingerprint: results[1],
       outline: results[2],
       info: results[3],
-      metadata: results[4],
+      metadata: results[4]
     };
   }
 
@@ -58,23 +58,23 @@ export class CustomWorker {
   }) {
     // Define `this.pdfManager`.
     this.getPdfManager(data);
-    return this.loadDocument(false)
+    return this.loadDocument(false);
   }
 
   // @ts-expect-error
   async GetPageRequest (data) {
     if (!this.pdfManager) {
-      throw new Error('pdfManager not initialized');
+      throw new Error("pdfManager not initialized");
     }
 
     const page = await this.pdfManager.getPage(data.pageIndex);
 
     const results = await Promise.all([
-      this.pdfManager.ensure(page, 'rotate'),
-      this.pdfManager.ensure(page, 'ref'),
-      this.pdfManager.ensure(page, 'view')
+      this.pdfManager.ensure(page, "rotate"),
+      this.pdfManager.ensure(page, "ref"),
+      this.pdfManager.ensure(page, "view")
     ]);
-      
+
     const pageInfo = {
       pageIndex: data.pageIndex,
       rotate: results[0],

@@ -28,9 +28,9 @@ export default class PDFFill {
       ...colorObj
     };
 
-    
+
     if (oneFill.w < 2 && oneFill.h < 2) {
-        return; //skip short thick lines, like PA SPP lines behinds checkbox
+      return; //skip short thick lines, like PA SPP lines behinds checkbox
     }
 
     targetData.Fills.push(oneFill);

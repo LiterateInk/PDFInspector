@@ -19,7 +19,7 @@ export class Font {
 
   exportData () {
     const data = {};
-    
+
     for (const key in this) {
       if (this.hasOwnProperty(key))
         // @ts-expect-error
@@ -32,7 +32,7 @@ export class Font {
   charToGlyph (charcode: number) {
     return {
       fontChar: String.fromCharCode(mapPrivateUseChars(charcode)),
-      unicode: typeof charcode === 'number' ? String.fromCharCode(charcode) : charcode
+      unicode: typeof charcode === "number" ? String.fromCharCode(charcode) : charcode
     };
   }
 

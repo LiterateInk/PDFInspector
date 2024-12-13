@@ -35,7 +35,7 @@ export interface Text {
   y: number,
   w: number,
   sw: number,
-  A: 'left' | 'center' | 'right',
+  A: "left" | "center" | "right",
   R: TextRun[]
   oc?:string;
   clr?: number;
